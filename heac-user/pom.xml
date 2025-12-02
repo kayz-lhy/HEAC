@@ -7,10 +7,11 @@
     <parent>
         <groupId>com.kayz</groupId>
         <artifactId>heac</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>heac-user</artifactId>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -19,32 +20,34 @@
     </properties>
 
     <dependencies>
-        <!--
-          Spring Cloud Alibaba 组件
-          包含 Nacos 注册中心、配置中心、Sentinel 流控、Seata 分布式事务
-        -->
+        <!-- ========================================================== -->
+        <!-- 1. 内部模块依赖 -->
+        <!-- ========================================================== -->
+        <dependency>
+            <groupId>com.kayz</groupId>
+            <artifactId>heac-common</artifactId>
+            <!-- 版本号由父工程管理，无需指定 -->
+        </dependency>
+
+        <!-- ========================================================== -->
+        <!-- 2. Spring Cloud Alibaba 组件 -->
+        <!-- ========================================================== -->
+        <!-- Nacos 服务发现 -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+        <!-- Nacos 配置中心 -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
+        <!-- Sentinel 流量防卫兵 -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
-        <!-- RocketMQ Spring Boot Starter，支持消息发送与消费 -->
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seata</groupId>
-            <artifactId>seata-spring-boot-starter</artifactId>
-            <version>2.5.0</version>
-        </dependency>
+        <!-- Seata 分布式事务 (使用 SCA 默认集成的版本，最稳妥) -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
@@ -55,124 +58,102 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Spring Boot 基础依赖 -->
+
+        <!-- ========================================================== -->
+        <!-- 3. Spring Boot 核心 -->
+        <!-- ========================================================== -->
+        <!-- Web 模块 (内含 Tomcat, Spring MVC, Jackson) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- 数据校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <!-- Actuator 监控 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- Quartz 定时任务 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+        <!-- 单元测试 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
 
-        <!-- MyBatis-Plus，简化 MyBatis 的 CRUD 操作 -->
+        <!-- ========================================================== -->
+        <!-- 4. 数据持久化 -->
+        <!-- ========================================================== -->
+        <!-- MyBatis Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
         </dependency>
-
-        <!-- Spring Boot 校验框架（基于 javax.validation 或 jakarta.validation） -->
+        <!-- Druid 连接池 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- PostgreSQL 驱动 -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
 
-        <!-- Lombok，减少样板代码，需在 IDE 启用插件 -->
+        <!-- ========================================================== -->
+        <!-- 5. 消息中间件 -->
+        <!-- ========================================================== -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- ========================================================== -->
+        <!-- 6. 工具库 (Lombok, Hutool 等) -->
+        <!-- ========================================================== -->
+        <!-- 注意：如果 heac-common 已经引入了 Hutool 和 Lombok，这里其实可以省略 -->
+        <!-- 但显式声明也不会错，版本号都走父工程 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- Hutool 常用工具类集合 -->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-        <!--druid 数据库连接池 -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.12.5</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.12.5</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>0.12.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.kayz</groupId>
-            <artifactId>heac-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Spring Boot 打包插件 (父工程已管理版本，这里只需引入) -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version> <!-- 最新支持 Java 21 -->
-                <configuration>
-                    <release>17</release>
-                </configuration>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>Maven Central Repository</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+
 </project>
+
+
+

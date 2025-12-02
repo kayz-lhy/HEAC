@@ -1,123 +1,220 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 优化后的 POM，修复重复依赖管理、版本对齐、更清晰的层次结构 -->
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- 只需要一个 parent：Spring Boot Starter Parent 就行 -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.7</version>
+        <relativePath/>
     </parent>
 
     <groupId>com.kayz</groupId>
     <artifactId>heac</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <!-- 模块声明 -->
+    <name>Heac Cloud Platform - Root</name>
+    <description>Root POM for the Heac Microservices Platform, managing versions, dependencies, and build lifecycle.
+    </description>
+
     <modules>
+        <module>heac-gateway</module>
         <module>heac-user</module>
         <module>heac-common</module>
-        <module>heac-template</module>
-        <module>heac-gateway</module>
     </modules>
 
-    <!-- 项目属性：统一 JDK 版本与第三方库版本 -->
     <properties>
+        <!-- ========================================================== -->
+        <!-- 1. Core Environment & Build Settings -->
+        <!-- ========================================================== -->
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- ========================================================== -->
+        <!-- 2. Spring Cloud Ecosystem (Aligned with Boot 3.2.7) -->
+        <!-- ========================================================== -->
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <spring-cloud-alibaba.version>2023.0.3.4</spring-cloud-alibaba.version>
+        <seata.version>2.5.0</seata.version> <!-- 注意：Cloud 2023.0.1.x 对应的 Seata 版本 -->
+
+        <!-- ========================================================== -->
+        <!-- 3. Data Persistence & Middleware -->
+        <!-- ========================================================== -->
         <mybatis-plus.version>3.5.14</mybatis-plus.version>
-        <rocketmq.version>2.3.4</rocketmq.version>
-        <hutool.version>5.8.40</hutool.version>
-        <lombok.version>1.18.42</lombok.version>
+        <postgresql.version>42.7.3</postgresql.version> <!-- 推荐使用兼容性更好的稳定版 -->
         <druid.version>1.2.23</druid.version>
+        <rocketmq.version>2.3.4</rocketmq.version>
+
+        <!-- ========================================================== -->
+        <!-- 4. Utility Libraries -->
+        <!-- ========================================================== -->
+        <hutool.version>5.8.40</hutool.version>
+        <jjwt.version>0.12.5</jjwt.version>
     </properties>
 
+    <!-- Defines versions for all dependencies. Submodules import what they need without specifying a version. -->
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Boot BOM（自动管理 Spring Boot 依赖版本）-->
+            <!-- Internal Project Modules -->
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.2.7</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>com.kayz</groupId>
+                <artifactId>heac-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.kayz</groupId>
+                <artifactId>heac-user</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
-            <!-- Spring Cloud BOM，用于服务发现、配置中心等（与 Boot 3.2 对齐）-->
+            <!-- Spring Cloud & Alibaba BOMs -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>2023.0.3</version>
+                <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-            <!-- Spring Cloud Alibaba BOM（兼容 Spring Cloud 2023.x + Boot 3.2）-->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>2023.0.3.4</version>
+                <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
 
-            <!-- MyBatis-Plus -->
+            <!-- Third-Party Libraries -->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
-
-            <!-- RocketMQ Spring Boot -->
             <dependency>
                 <groupId>org.apache.rocketmq</groupId>
                 <artifactId>rocketmq-spring-boot-starter</artifactId>
                 <version>${rocketmq.version}</version>
             </dependency>
-
-            <!-- Hutool -->
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
-
-            <!-- Lombok -->
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-                <optional>true</optional>
-            </dependency>
-
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
+
+            <!-- JWT -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+
+            <!-- 数据库驱动 -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <build>
-        <plugins>
-            <!-- Java 编译插件 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <release>${java.version}</release>
-                </configuration>
-            </plugin>
-        </plugins>
+        <!-- Standardized build output name -->
+        <finalName>${project.artifactId}</finalName>
+
+        <!-- Defines standard plugin versions and configurations for all submodules. -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>3.2.7</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <parameters>true</parameters>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <!-- Enables resource filtering based on active profile (e.g., application-${profile}.yml) -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
+    <!-- Profiles for different environments (dev, test, prod) -->
+    <profiles>
+        <!-- Development Environment (default) -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+        </profile>
+        <!-- Testing Environment -->
+        <profile>
+            <id>test</id>
+            <properties>
+                <profiles.active>test</profiles.active>
+            </properties>
+        </profile>
+        <!-- Production Environment -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
     <repositories>
+        <repository>
+            <id>aliyun-nexus</id>
+            <name>Aliyun Nexus Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>central</id>
             <name>Maven Central Repository</name>
@@ -130,4 +227,16 @@
             </snapshots>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>aliyun-nexus</id>
+            <name>Aliyun Nexus Plugin Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>central</id>
+            <name>Maven Central Plugin Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

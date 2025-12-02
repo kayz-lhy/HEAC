@@ -3,76 +3,110 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- 1. 继承父工程 -->
     <parent>
         <groupId>com.kayz</groupId>
         <artifactId>heac</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
-    <groupId>com.kayz.heac</groupId>
     <artifactId>heac-gateway</artifactId>
+    <packaging>jar</packaging>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <description>API Gateway (WebFlux/Reactive)</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
+        <!-- ========================================================== -->
+        <!-- 1. 核心架构 (WebFlux + Gateway) -->
+        <!-- ========================================================== -->
+        <!--
+            【核心】WebFlux 响应式 Web 容器 (Netty)
+            注意：绝对不能引入 spring-boot-starter-web (Tomcat)
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-        <!-- Gateway 核心 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
-
-        <!-- 客户端负载均衡 (必须，否则 lb:// 无法解析) -->
+        <!-- 客户端负载均衡 (lb:// 协议支持) -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
-        <!-- 服务发现 (Nacos) -->
+        <!-- ========================================================== -->
+        <!-- 2. Spring Cloud Alibaba -->
+        <!-- ========================================================== -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
-        <!-- 响应式 Redis (Gateway 是基于 WebFlux 的，必须用 Reactive) -->
+        <!-- ========================================================== -->
+        <!-- 3. 响应式 Redis -->
+        <!-- ========================================================== -->
+        <!--
+            【关键】必须使用 reactive 版本
+            用于 GlobalFilter 中做高并发的 Token 校验和黑名单检查
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
-        <!-- 引入你的 common 模块，复用 JwtUtil 和常量 -->
+        <!-- ========================================================== -->
+        <!-- 4. 内部模块 & 工具 -->
+        <!-- ========================================================== -->
         <dependency>
             <groupId>com.kayz</groupId>
             <artifactId>heac-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <!-- 防御性编程：防止 Common 未来意外引入阻塞式组件导致网关启动失败 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-redis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
+        <!-- 基础工具 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
+
+        <!--
+            可选：如果你需要在 Gateway 做参数校验
+            Common 引入了 starter-validation，它兼容 WebFlux，这里不用额外处理
+        -->
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 必须引入打包插件，否则生成的 jar 无法运行 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
