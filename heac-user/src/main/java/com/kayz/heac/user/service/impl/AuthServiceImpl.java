@@ -86,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
                 .account(user.getAccount())
                 .token(token)
                 .role(user.isAdmin() ? "ADMIN" : "USER")
+                .expireIn(tokenService.getAccessTokenExpMinutes())
                 .build();
     }
 

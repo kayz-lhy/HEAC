@@ -18,4 +18,7 @@ public interface TokenService {
 
     // 销毁 Token
     void invalidateToken(String token);
+
+    // 获取 Token 的有效期 (分钟)
+    Long getAccessTokenExpMinutes();
 }
