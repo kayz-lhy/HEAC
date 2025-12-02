@@ -12,11 +12,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthInterceptor implements HandlerInterceptor {
 
     private final TokenService tokenService;
-    private final UserContext userContext;
 
-    public AuthInterceptor(TokenService tokenService, UserContext userContext) {
+    public AuthInterceptor(TokenService tokenService) {
         this.tokenService = tokenService;
-        this.userContext = userContext;
     }
 
     @Override
@@ -27,7 +25,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (token != null && tokenService.validateToken(token)) {
             String userId = tokenService.getUserIdFromToken(token);
             // ！！！关键一步：将 ID 放入上下文
-            userContext.setUserId(userId);
+            UserContext.setUserId(userId);
             return true;
         }
 
@@ -37,6 +35,6 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        userContext.clear();
+        UserContext.clear();
     }
 }

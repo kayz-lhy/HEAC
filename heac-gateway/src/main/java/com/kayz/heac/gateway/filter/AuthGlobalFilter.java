@@ -1,6 +1,6 @@
 package com.kayz.heac.gateway.filter;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.kayz.heac.common.consts.RedisPrefix;
 import com.kayz.heac.common.util.JwtUtil;
 import com.kayz.heac.gateway.config.IgnoreUrlsConfig;
@@ -32,14 +32,12 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     private final ReactiveStringRedisTemplate redisTemplate;
     private final JwtUtil jwtUtil;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-    private final IgnoreUrlsConfig ignoreUrlsConfig;
 
     private final List<String> ignoreUrls;
 
     public AuthGlobalFilter(ReactiveStringRedisTemplate redisTemplate, JwtUtil jwtUtil, IgnoreUrlsConfig ignoreUrlsConfig) {
         this.redisTemplate = redisTemplate;
         this.jwtUtil = jwtUtil;
-        this.ignoreUrlsConfig = ignoreUrlsConfig;
 
         this.ignoreUrls = ignoreUrlsConfig.getUrls();
     }
@@ -56,7 +54,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
         // 2. 获取 Authorization Header
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (StrUtil.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
+
+        if (CharSequenceUtil.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
             return buildErrorResponse(exchange, "未登录或非法访问");
         }
         String token = authHeader.substring(7);
@@ -71,7 +70,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         String redisKey = RedisPrefix.TOKEN_CACHE_PREFIX + token;
         return redisTemplate.hasKey(redisKey)
                 .flatMap(hasKey -> {
-                    if (!hasKey) {
+                    if (Boolean.FALSE.equals(hasKey)) {
                         return buildErrorResponse(exchange, "令牌已失效");
                     }
 

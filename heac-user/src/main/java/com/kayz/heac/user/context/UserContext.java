@@ -14,4 +14,8 @@ public class UserContext {
     public static void clear() {
         USER_ID.remove();
     }
+
+    private UserContext() {
+        throw new UnsupportedOperationException("Cannot instantiate UserContext");
+    }
 }
