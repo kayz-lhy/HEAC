@@ -22,14 +22,14 @@ public class JwtUtil {
     private final SecretKey key;
 
     @Getter
-    private final int accessTokenExpMinutes;
+    private final long accessTokenExpMinute;
 
     // 构造器注入配置
     public JwtUtil(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-expiration-minutes}") int accessTokenExpMinutes) {
+            @Value("${jwt.accessTokenExpirationMinute}") long accessTokenExpMinute) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.accessTokenExpMinutes = accessTokenExpMinutes;
+        this.accessTokenExpMinute = accessTokenExpMinute;
     }
 
     /**
@@ -39,7 +39,7 @@ public class JwtUtil {
      */
     public String createToken(String userId, Map<String, Object> claims) {
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + (long) accessTokenExpMinutes * 60 * 1000);
+        Date expirationDate = new Date(now.getTime() + (long) accessTokenExpMinute * 60 * 1000);
 
         JwtBuilder builder = Jwts.builder()
                 .subject(userId)           // 标准 subject 存 ID

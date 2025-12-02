@@ -31,6 +31,8 @@
         <!-- 1. Core Environment & Build Settings -->
         <!-- ========================================================== -->
         <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- ========================================================== -->
@@ -53,6 +55,8 @@
         <!-- ========================================================== -->
         <hutool.version>5.8.40</hutool.version>
         <jjwt.version>0.12.5</jjwt.version>
+        <lombok.version>1.18.42</lombok.version>
+        <caffeine.version>3.2.3</caffeine.version>
     </properties>
 
     <!-- Defines versions for all dependencies. Submodules import what they need without specifying a version. -->
@@ -131,16 +135,54 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
             </dependency>
+
+            <!-- Caffeine Cache -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <build>
-        <!-- Standardized build output name -->
         <finalName>${project.artifactId}</finalName>
 
-        <!-- Defines standard plugin versions and configurations for all submodules. -->
+        <plugins>
+            <!-- 核心编译插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <!-- 必须设置为 true，否则 MyBatis-Plus 无法绑定参数 -->
+                    <parameters>true</parameters>
+
+                    <!-- 【核心修复】显式指定注解处理器路径 -->
+                    <annotationProcessorPaths>
+                        <!-- Lombok 处理器 -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <!-- Spring Boot 配置处理器 (可选，但在 Boot 项目中推荐加上) -->
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>3.2.7</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+
         <pluginManagement>
             <plugins>
+                <!-- Spring Boot 打包插件 -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
@@ -153,26 +195,8 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
-                    <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
-                        <parameters>true</parameters>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
-
-        <!-- Enables resource filtering based on active profile (e.g., application-${profile}.yml) -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 
     <!-- Profiles for different environments (dev, test, prod) -->

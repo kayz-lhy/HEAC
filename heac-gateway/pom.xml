@@ -92,6 +92,11 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!--
             可选：如果你需要在 Gateway 做参数校验
             Common 引入了 starter-validation，它兼容 WebFlux，这里不用额外处理

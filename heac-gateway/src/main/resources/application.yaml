@@ -56,8 +56,10 @@ jwt:
   # 令牌签名密钥 (必须足够复杂)
   secret: ThisIsASecretKeyForYourHotspotAggregationSystem
   # Access Token 有效期 (分钟)
-  access-token-expiration-minutes: 60
-  # Redis 存储 JWT 黑名单的 Key 前缀
-  redis-blacklist-prefix: "jwt:blacklist:"
-  # 声明中用于标识用户匿名ID的Key
-  anonymous-id-key: "anonymous_id"
+  accessTokenExpirationMinute: 60
+
+
+logging:
+  # 这是一个非常干净的日志格式，没有 TraceID 占位符
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} : %m%n"

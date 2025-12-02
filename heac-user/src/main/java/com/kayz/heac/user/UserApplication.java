@@ -13,9 +13,9 @@ import java.util.TimeZone;
 
 @SpringBootApplication()
 @MapperScan("com.kayz.heac.user.mapper")
-@EnableAutoDataSourceProxy(dataSourceProxyMode = "at")
 @Slf4j
 @ComponentScan("com.kayz.heac")
+@EnableAutoDataSourceProxy(dataSourceProxyMode = "AT")
 public class UserApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class, args);

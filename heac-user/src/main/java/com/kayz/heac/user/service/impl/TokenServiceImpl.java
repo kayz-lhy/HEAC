@@ -39,11 +39,11 @@ public class TokenServiceImpl implements TokenService {
         // 这一步是 TokenService 的核心职责：管理 Token 的状态
         String redisKey = RedisPrefix.TOKEN_CACHE_PREFIX + token;
 
-        // 注意：这里使用了 jwtUtil.getAccessTokenExpMinutes()，确保 Redis 过期时间与 JWT 一致
+        // 注意：这里使用了 jwtUtil.getAccessTokenExpMinute()，确保 Redis 过期时间与 JWT 一致
         redisTemplate.opsForValue().set(
                 redisKey,
                 user.getId(),
-                jwtUtil.getAccessTokenExpMinutes(),
+                jwtUtil.getAccessTokenExpMinute(),
                 TimeUnit.MINUTES
         );
 
@@ -67,6 +67,11 @@ public class TokenServiceImpl implements TokenService {
         // 登出逻辑：直接删除 Redis Key
         // 纯净版 JwtUtil 不需要知道怎么注销，这里直接操作 Redis 即可
         redisTemplate.delete(RedisPrefix.TOKEN_CACHE_PREFIX + token);
+    }
+
+    @Override
+    public Long getAccessTokenExpMinutes() {
+        return jwtUtil.getAccessTokenExpMinute();
     }
 
     @Override

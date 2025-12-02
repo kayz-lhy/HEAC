@@ -1,0 +1,5 @@
+jwt:
+  # 令牌签名密钥 (必须足够复杂)
+  secret: ThisIsASecretKeyForYourHotspotAggregationSystem
+  # Access Token 有效期 (分钟)
+  accessTokenExpirationMinute: 60L

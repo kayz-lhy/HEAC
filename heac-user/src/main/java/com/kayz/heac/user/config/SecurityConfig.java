@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,22 +28,10 @@ public class SecurityConfig {
         http
                 // 禁用 CSRF（如果是 API 项目）
                 .csrf(AbstractHttpConfigurer::disable)
-
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 禁用 Session
                 // 允许所有请求或按路径控制
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**", "/login", "/error", "*/**").permitAll() // 无需认证
-                        .anyRequest().authenticated() // 其它请求需要认证
-                )
-
-                // 表单登录
-                .formLogin(AbstractHttpConfigurer::disable)
-
-                // 登出
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
+                        .anyRequest().permitAll() // 无需认证
                 );
 
         return http.build();
