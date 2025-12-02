@@ -6,6 +6,7 @@ import org.apache.seata.spring.annotation.datasource.EnableAutoDataSourceProxy;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Date;
 import java.util.TimeZone;
@@ -14,6 +15,7 @@ import java.util.TimeZone;
 @MapperScan("com.kayz.heac.user.mapper")
 @EnableAutoDataSourceProxy(dataSourceProxyMode = "at")
 @Slf4j
+@ComponentScan("com.kayz.heac")
 public class UserApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class, args);

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+@Deprecated(since = "1.0.0")
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
 

@@ -38,9 +38,9 @@ public class UserLoginInfoSyncJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // 1. 获取 Redis Hash 中所有数据
-        Map<Object, Object> time_entries = redisTemplate.opsForHash().entries(LOGIN_TIME_CACHE_KEY);
-        Map<Object, Object> ip_entries = redisTemplate.opsForHash().entries(LOGIN_IP_CACHE_KEY);
-        if (time_entries.isEmpty() && ip_entries.isEmpty()) {
+        Map<Object, Object> timeEntries = redisTemplate.opsForHash().entries(LOGIN_TIME_CACHE_KEY);
+        Map<Object, Object> ipEntries = redisTemplate.opsForHash().entries(LOGIN_IP_CACHE_KEY);
+        if (timeEntries.isEmpty() && ipEntries.isEmpty()) {
             return;
         }
 
@@ -50,7 +50,7 @@ public class UserLoginInfoSyncJob extends QuartzJobBean {
 
         // 2. 转换数据
         try {
-            time_entries.forEach((userIdObj, timeStrObj) -> {
+            timeEntries.forEach((userIdObj, timeStrObj) -> {
                 String userId = (String) userIdObj;
 
                 User user = User.empty()
@@ -60,7 +60,7 @@ public class UserLoginInfoSyncJob extends QuartzJobBean {
                 updateList.add(user);
                 processedUserIds.add(userId);
             });
-            ip_entries.forEach((userIdObj, ipObj) -> {
+            ipEntries.forEach((userIdObj, ipObj) -> {
                 String userId = (String) userIdObj;
 
                 User user = updateList.stream()

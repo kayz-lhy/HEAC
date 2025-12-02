@@ -1,0 +1,63 @@
+server:
+  port: 9000 # 网关一般用 80, 443, 8080 或 9000
+
+spring:
+  application:
+    name: heac-gateway
+  config:
+    import: nacos:heac-gateway.yaml
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+
+    gateway:
+      # --- 跨域配置 (CORS) ---
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]': # 拦截所有请求
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            allowedOriginPatterns:
+              - "http://localhost:*"
+
+      # --- 路由配置 ---
+      routes:
+        # 用户服务路由
+        - id: user-service-route
+          uri: lb://heac-user # lb 代表 LoadBalancer，后面接服务名
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=1 # 去掉第一层路径。请求 /api/user/login -> 转发给 user-service 的 /login
+
+# 自定义配置：白名单接口 (不需要 Token 的接口)
+secure:
+  ignore:
+    urls:
+      - /api/user/login
+      - /api/user/register
+      - /doc.html
+      - /swagger-ui.html
+
+
+jwt:
+  # 令牌签名密钥 (必须足够复杂)
+  secret: ThisIsASecretKeyForYourHotspotAggregationSystem
+  # Access Token 有效期 (分钟)
+  access-token-expiration-minutes: 60
+  # Redis 存储 JWT 黑名单的 Key 前缀
+  redis-blacklist-prefix: "jwt:blacklist:"
+  # 声明中用于标识用户匿名ID的Key
+  anonymous-id-key: "anonymous_id"

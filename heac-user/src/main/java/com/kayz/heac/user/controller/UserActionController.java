@@ -8,10 +8,12 @@ import com.kayz.heac.common.exception.AuthException;
 import com.kayz.heac.user.service.AuthService;
 import com.kayz.heac.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping
 public class UserActionController {
     private final UserService userService;
     private final AuthService authService;
@@ -21,14 +23,23 @@ public class UserActionController {
         this.authService = authService;
     }
 
-    // ? is there any of them
+    /**
+     * 用户注册接口
+     *
+     * @param request 注册请求体
+     */
     @PostMapping("/register")
     public HeacResponseEntity<String> register(@RequestBody UserRegisterDTO request) {
         try {
             userService.register(request);
+            log.info("用户注册成功，账号：{}", request.getAccount());
             return HeacResponseEntity.success("注册成功");
+        } catch (AuthException e) {
+            log.warn("用户注册失败，账号：{}，原因：{}", request.getAccount(), e.getMessage());
+            return HeacResponseEntity.error("400", e.getMessage());
         } catch (Exception e) {
-            return HeacResponseEntity.internalServerError("注册失败", "500");
+            log.error("用户注册失败，账号：{}，异常：{}", request.getAccount(), e.getMessage());
+            return HeacResponseEntity.internalServerError(e.getMessage());
         }
     }
 
@@ -41,9 +52,14 @@ public class UserActionController {
     public HeacResponseEntity<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
         try {
             UserLoginVO response = authService.login(userLoginDTO, request);
+            log.info("用户登录成功，账号：{}", userLoginDTO.getAccount());
             return HeacResponseEntity.success(response, "登录成功");
         } catch (AuthException e) {
-            return HeacResponseEntity.error("500", e.getMessage());
+            log.warn("用户登录失败，账号：{}，原因：{}", userLoginDTO.getAccount(), e.getMessage());
+            return HeacResponseEntity.error("400", e.getMessage());
+        } catch (Exception e) {
+            log.error("用户登录失败，账号：{}，异常：{}", userLoginDTO.getAccount(), e.getMessage());
+            return HeacResponseEntity.internalServerError(e.getMessage());
         }
     }
 
@@ -51,31 +67,26 @@ public class UserActionController {
     public HeacResponseEntity<String> logout(@RequestBody String token) {
         try {
             authService.logout(token);
+            log.info("用户登出成功，令牌：{}", token);
             return HeacResponseEntity.success("登出成功");
         } catch (AuthException e) {
-            return HeacResponseEntity.error("500", e.getMessage());
+            log.warn("用户登出失败，令牌：{}，原因：{}", token, e.getMessage());
+            return HeacResponseEntity.error("400", e.getMessage());
+        } catch (Exception e) {
+            log.error("用户登出失败，令牌：{}，异常：{}", token, e.getMessage());
+            return HeacResponseEntity.internalServerError(e.getMessage());
         }
     }
 
-//    @PostMapping("/updateLastLoginIp")
-//    public HeacResponseEntity<String> updateLastLoginIp(@RequestBody String token, @RequestParam("ip") String ip) {
-//        userService.updateLastLoginIp(token, ip);
-//        return HeacResponseEntity.success("更新成功");
-//    }
-
-//    @PostMapping("/updateLastLoginTime")
-//    public HeacResponseEntity<String> updateLastLoginTime(@RequestBody String token, @RequestParam("lastLoginTime") LocalDateTime lastLoginTime) {
-//        userService.updateLastLoginTime(token, lastLoginTime);
-//        return HeacResponseEntity.success("更新成功");
-//    }
-
     @PostMapping("/updateRealNameStatus")
-    public HeacResponseEntity<String> updateRealNameStatus(@RequestBody String userId, @RequestParam("realNameStatus") Boolean realNameStatus) {
+    public HeacResponseEntity<String> updateRealNameStatus(@RequestBody String userIdToModify, @RequestParam("realNameStatus") Boolean realNameStatus) {
         try {
-            userService.updateRealNameStatus(userId, realNameStatus);
+            userService.updateRealNameStatus(userIdToModify, realNameStatus);
+            log.info("实名认证状态更新成功，用户ID：{}", userIdToModify);
             return HeacResponseEntity.success("更新成功");
         } catch (Exception e) {
-            return HeacResponseEntity.error("500", "更新失败:" + e.getMessage());
+            log.error("实名认证状态更新失败，用户ID：{}，异常：{}", userIdToModify, e.getMessage());
+            return HeacResponseEntity.internalServerError(e.getMessage());
         }
     }
 }
