@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: docker.io/library/mongo:7.0
+    container_name: mongo
+    restart: always
+
+    # 映射端口：宿主 27017 -> 容器 27017
+    ports:
+      - "27017:27017"
+
+    # 数据持久化目录
+    volumes:
+      - ./data/db:/data/db
+
+    # 简单环境变量（可根据需要调整）
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+

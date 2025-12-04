@@ -2,8 +2,6 @@ server:
   port: 15000
 
 spring:
-  main:
-    lazy-initialization: true
   application:
     name: heac-user
     admin:
@@ -15,7 +13,9 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
-
+    mongodb:
+      uri: mongodb://user:password@localhost:27017/heac?authSource=admin
+      auto-index-creation: true
 
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres?currentSchema=public&stringtype=unspecified&timezone=Asia/Shanghai
@@ -77,3 +77,16 @@ jwt:
   redis-blacklist-prefix: "jwt:blacklist:"
   # 声明中用于标识用户匿名ID的Key
   anonymous-id-key: "anonymous_id"
+
+
+rocketmq:
+  name-server: 127.0.0.1:9876 # 你的 RocketMQ 地址
+  producer:
+    # 生产者组名，必须全局唯一
+    group: heac-user-login-log-producer-group
+    # 发送超时时间 (毫秒)
+    send-message-timeout: 30000
+
+logging:
+  level:
+    root: debug

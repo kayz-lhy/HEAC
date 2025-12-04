@@ -1,6 +1,6 @@
 package com.kayz.heac.user.interceptor;
 
-import com.kayz.heac.user.context.UserContext;
+import com.kayz.heac.common.context.UserContext;
 import com.kayz.heac.user.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

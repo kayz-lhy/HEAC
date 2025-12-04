@@ -24,6 +24,7 @@
         <module>heac-gateway</module>
         <module>heac-user</module>
         <module>heac-common</module>
+        <module>heac-event</module>
     </modules>
 
     <properties>

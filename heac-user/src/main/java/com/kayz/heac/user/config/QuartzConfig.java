@@ -1,5 +1,6 @@
 package com.kayz.heac.user.config;
 
+import com.kayz.heac.user.job.SecurityMonitorJob;
 import com.kayz.heac.user.job.UserLoginInfoSyncJob;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +21,6 @@ public class QuartzConfig {
                 .withDescription("同步用户最后登录时间从Redis到DB")
                 .build();
     }
-
     /**
      * 定义 Trigger
      * 描述触发规则
@@ -34,6 +34,25 @@ public class QuartzConfig {
                 .forJob(userLoginTimeSyncJobDetail()) // 关联上面的 JobDetail
                 .withIdentity("userLoginTimeSyncTrigger", "userGroup")
                 .withSchedule(scheduleBuilder)
+                .build();
+    }
+
+    @Bean
+    public JobDetail securityMonitorJobDetail() {
+        return JobBuilder.newJob(SecurityMonitorJob.class)
+                .withIdentity("securityMonitorJob", "securityGroup")
+                .storeDurably()
+                .build();
+    }
+
+    // 2. 定义 Trigger (什么时候做)
+    // 这里设置为每 2 分钟执行一次
+    @Bean
+    public Trigger securityMonitorTrigger() {
+        return TriggerBuilder.newTrigger()
+                .forJob(securityMonitorJobDetail())
+                .withIdentity("securityMonitorTrigger", "securityGroup")
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/2 * * * ?"))
                 .build();
     }
 }

@@ -1,7 +1,7 @@
 package com.kayz.heac.user.service;
 
-import com.kayz.heac.common.dto.UserLoginDTO;
-import com.kayz.heac.common.dto.UserLoginVO;
+import com.kayz.heac.user.dto.UserLoginDTO;
+import com.kayz.heac.user.dto.UserLoginVO;
 import jakarta.servlet.http.HttpServletRequest;
 
 

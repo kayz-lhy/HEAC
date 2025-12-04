@@ -2,15 +2,16 @@ package com.kayz.heac.user.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.kayz.heac.common.dto.UserRegisterDTO;
 import com.kayz.heac.common.exception.AuthException;
 import com.kayz.heac.common.exception.UserActionException;
 import com.kayz.heac.common.util.JwtUtil;
+import com.kayz.heac.user.dto.UserRegisterDTO;
 import com.kayz.heac.user.entity.User;
 import com.kayz.heac.user.mapper.UserMapper;
 import com.kayz.heac.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.apache.seata.spring.annotation.GlobalTransactional;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,7 +39,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
     private final RedisTemplate<String, Object> redisTemplate;
-
+    private final RocketMQTemplate rocketMQTemplate;
     /**
      * 安全验证并更新用户信息的模板方法。
      * 集成了 Seata 以支持分布式事务回滚。
@@ -147,4 +148,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .set(User::getRealNameStatus, status)
                 .update();
     }
+
+    @Override
+    public void lockUserByAccount(String account) {
+        // 1. 查询用户
+        User user = userMapper.findUserByAccount(account);
+        if (user != null && user.getStatus() == User.UserStatus.NORMAL) {
+            // 2. 更新状态
+            user.setStatus(User.UserStatus.BANNED);
+            this.updateById(user);
+        }
+        // TODO 其他审查逻辑
+        log.info("账号 {} 已被锁定", account);
+    }
+
+
 }

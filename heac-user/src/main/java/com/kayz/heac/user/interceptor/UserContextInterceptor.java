@@ -2,7 +2,7 @@ package com.kayz.heac.user.interceptor;
 
 
 import cn.hutool.core.text.CharSequenceUtil;
-import com.kayz.heac.user.context.UserContext;
+import com.kayz.heac.common.context.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;

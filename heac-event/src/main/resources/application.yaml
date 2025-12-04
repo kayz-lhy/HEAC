@@ -1,0 +1,91 @@
+mybatis-plus:
+  # 1. 实体类扫描包
+  type-aliases-package: com.kayz.heac.event.entity
+  # 2. 枚举类扫描包 (自动将数据库 TEXT 映射为 Java Enum)
+  type-enums-package: com.kayz.heac.event.enums
+  configuration:
+    # 开启驼峰命名转换 (create_time -> createTime)
+    map-underscore-to-camel-case: true
+    # 开启二级缓存 (可选)
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 3. 逻辑删除配置 (配合数据库 deleted 字段)
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      # 4. ID 生成策略 (Java生成UUID，不依赖数据库函数，性能更好)
+      id-type: assign_uuid
+
+
+spring:
+  application:
+    name: heac-event
+    admin:
+      enabled: true
+  config:
+    import: nacos:heac-event.yaml
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+    mongodb:
+      uri: mongodb://user:password@localhost:27017/heac-event?authSource=admin
+      auto-index-creation: true
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848  # Nacos 注册中心地址
+      config:
+        server-addr: 127.0.0.1:8848  # Nacos 配置中心地址
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=public&stringtype=unspecified&timezone=Asia/Shanghai
+    username: user
+    password: password
+
+
+seata:
+  enable-auto-data-source-proxy: true
+  enabled: true
+  application-id: heac-user
+  tx-service-group: heac-user-group
+  service:
+    vgroup-mapping:
+      heac-user-group: default  # 指向 seata-server 默认分组
+
+  client:
+    rm:
+      async-commit-buffer-limit: 10000
+    tm:
+      commit-retry-count: 5
+      rollback-retry-count: 5
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: "SEATA_GROUP"
+      namespace: "public"
+      cluster: default
+
+rocketmq:
+  name-server: 127.0.0.1:9876 # 你的 RocketMQ 地址
+  producer:
+    # 生产者组名，必须全局唯一
+    group: heac-event-login-log-producer-group
+    # 发送超时时间 (毫秒)
+    send-message-timeout: 30000
+
+jwt:
+  # 令牌签名密钥 (必须足够复杂)
+  secret: ThisIsASecretKeyForYourHotspotAggregationSystem
+  # Access Token 有效期 (分钟)
+  accessTokenExpirationMinute: 60
+
+logging:
+  level:
+    root: info
+    mh.mapper: debug

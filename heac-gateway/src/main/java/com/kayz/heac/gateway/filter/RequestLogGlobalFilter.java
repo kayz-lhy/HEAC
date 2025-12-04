@@ -2,33 +2,34 @@ package com.kayz.heac.gateway.filter;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static com.kayz.heac.common.util.IpUtil.getIpAddress;
 
 /**
  * 网关全局请求日志过滤器 (修复版：清洗数据 + 单行JSON)
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RequestLogGlobalFilter implements GlobalFilter, Ordered {
 
     private static final String START_TIME = "startTime";
     private static final DateTimeFormatter DTM_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -84,22 +85,4 @@ public class RequestLogGlobalFilter implements GlobalFilter, Ordered {
         return Ordered.HIGHEST_PRECEDENCE;
     }
 
-    private String getIpAddress(ServerHttpRequest request) {
-        HttpHeaders headers = request.getHeaders();
-        String ip = headers.getFirst("x-forwarded-for");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip) && ip.contains(",")) {
-            ip = ip.split(",")[0];
-        }
-
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = headers.getFirst("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            InetSocketAddress remoteAddress = request.getRemoteAddress();
-            if (remoteAddress != null) {
-                ip = remoteAddress.getAddress().getHostAddress();
-            }
-        }
-        return ip != null ? ip : "unknown";
-    }
 }
