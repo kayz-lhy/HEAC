@@ -122,7 +122,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-
+        <!-- Spring Data MongoDB (响应式或非响应式均可，Consumer这里用阻塞式写法更简单) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
         <!-- ========================================================== -->
         <!-- 5. 消息中间件 -->
         <!-- ========================================================== -->

@@ -1,4 +1,4 @@
-package com.kayz.heac.user.context;
+package com.kayz.heac.common.context;
 
 public class UserContext {
     private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();

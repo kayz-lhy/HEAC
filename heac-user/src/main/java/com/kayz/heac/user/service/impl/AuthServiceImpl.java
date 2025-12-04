@@ -1,16 +1,19 @@
 package com.kayz.heac.user.service.impl;
 
 import com.kayz.heac.common.consts.RedisPrefix;
-import com.kayz.heac.common.dto.UserLoginDTO;
-import com.kayz.heac.common.dto.UserLoginVO;
+import com.kayz.heac.common.dto.UserLoginLogDTO;
 import com.kayz.heac.common.exception.AuthException;
 import com.kayz.heac.common.exception.UserActionException;
-import com.kayz.heac.common.util.JwtUtil;
+import com.kayz.heac.user.dto.UserLoginDTO;
+import com.kayz.heac.user.dto.UserLoginVO;
 import com.kayz.heac.user.entity.User;
 import com.kayz.heac.user.service.AuthService;
 import com.kayz.heac.user.service.TokenService;
 import com.kayz.heac.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +21,13 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final TokenService tokenService;
     private final UserService userService;
     private final RedisTemplate<String, Object> redisTemplate;
-
-    public AuthServiceImpl(TokenService tokenService, UserService userService, RedisTemplate<String, Object> redisTemplate) {
-        this.tokenService = tokenService;
-        this.userService = userService;
-        this.redisTemplate = redisTemplate;
-    }
+    private final RocketMQTemplate rocketMQTemplate;
 
     /**
      * Authenticates a user and creates a new session.
@@ -59,17 +59,22 @@ public class AuthServiceImpl implements AuthService {
      * @throws UserActionException if account doesn't exist, password is incorrect, or account is banned
      * @see UserLoginDTO
      * @see UserLoginVO
-     * @see JwtUtil#createToken(User)
      */
 
     @Override
     public UserLoginVO login(UserLoginDTO dto, HttpServletRequest request) throws AuthException {
         // 1. Retrieve user by account
-        User user = userService.validateUserCredentials(dto.getAccount(), dto.getPassword());
+        User user = null;
+        try {
+            user = userService.validateUserCredentials(dto.getAccount(), dto.getPassword());
+        } catch (AuthException e) {
+            sendLoginLogMessage(buildLoginLog(user, dto.getAccount(), request));
+            throw new AuthException("用户密码校验失败");
+        }
 
         // 3. Check account status
         if (user.getStatus() == User.UserStatus.BANNED) {
-            throw new AuthException("账号已被封禁");
+            throw new AuthException("账号已被封禁, 请与管理员联系");
         }
 
         // 4. Update login information (timestamp) - synchronous for simplicity
@@ -80,6 +85,7 @@ public class AuthServiceImpl implements AuthService {
         // 5. Generate JWT Token with user claims (userId, role, realNameStatus)
         String token = tokenService.createAndCacheToken(user);
 
+        sendLoginLogMessage(buildLoginLog(user, dto.getAccount(), request));
         // 6. Build and return login response
         return UserLoginVO.builder()
                 .userId(user.getId())
@@ -93,5 +99,39 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String token) {
         tokenService.invalidateToken(token);
+    }
+
+
+    private void sendLoginLogMessage(UserLoginLogDTO user) {
+        try {
+            log.info("准备发送登录日志消息: userId={}, account={}, ip={}", user.getUserId(), user.getAccount(), user.getIp());
+            // 发送消息
+            // 参数1: topic:tag (主题:标签)
+            // 参数2: 消息体 (会自动序列化为 JSON)
+            rocketMQTemplate.convertAndSend("user-topic:login", user);
+            log.info("登录日志消息已发送: {}", user);
+
+        } catch (Exception e) {
+            // ！！！关键点：日志发送失败不应该影响用户登录成功
+            // 只需要记录错误日志，后续排查即可
+            log.error("发送登录日志消息失败", e);
+        }
+    }
+
+    private UserLoginLogDTO buildLoginLog(User user, String account, HttpServletRequest request) {
+        if (user == null) {
+            return UserLoginLogDTO.builder()
+                    .userId(null)
+                    .account(account)
+                    .ip(request.getRemoteAddr())
+                    .loginTime(LocalDateTime.now())
+                    .build();
+        }
+        return UserLoginLogDTO.builder()
+                .userId(user.getId())
+                .account(account)
+                .ip(request.getRemoteAddr())
+                .loginTime(LocalDateTime.now())
+                .build();
     }
 }

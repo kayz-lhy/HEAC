@@ -1,27 +1,24 @@
 package com.kayz.heac.user.controller;
 
-import com.kayz.heac.common.dto.UserLoginDTO;
-import com.kayz.heac.common.dto.UserLoginVO;
-import com.kayz.heac.common.dto.UserRegisterDTO;
 import com.kayz.heac.common.entity.HeacResponseEntity;
 import com.kayz.heac.common.exception.AuthException;
+import com.kayz.heac.user.dto.UserLoginDTO;
+import com.kayz.heac.user.dto.UserLoginVO;
+import com.kayz.heac.user.dto.UserRegisterDTO;
 import com.kayz.heac.user.service.AuthService;
 import com.kayz.heac.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
 @RequestMapping
+@RequiredArgsConstructor
 public class UserActionController {
     private final UserService userService;
     private final AuthService authService;
-
-    public UserActionController(UserService userService, AuthService authService) {
-        this.userService = userService;
-        this.authService = authService;
-    }
 
     /**
      * 用户注册接口

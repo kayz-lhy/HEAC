@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # NameServer 服务
+  namesrv:
+    image: apache/rocketmq:4.9.7
+    container_name: rmqnamesrv
+    ports:
+      - "9876:9876"
+    environment:
+      - JAVA_OPT_EXT=-server -Xms256m -Xmx256m -Xmn128m
+    command: sh mqnamesrv
+    networks:
+      - rmq
+
+  # Broker 服务
+  broker:
+    image: apache/rocketmq:4.9.7
+    container_name: rmqbroker
+    ports:
+      - "10911:10911"
+      - "10909:10909"
+    environment:
+      - NAMESRV_ADDR=namesrv:9876
+      - JAVA_OPT_EXT=-server -Xms512m -Xmx512m -Xmn256m
+    volumes:
+      - ./conf/broker.conf:/home/rocketmq/rocketmq-4.9.7/conf/broker.conf
+    command: sh mqbroker -n namesrv:9876 -c /home/rocketmq/rocketmq-4.9.7/conf/broker.conf
+    depends_on:
+      - namesrv
+    networks:
+      - rmq
+
+  # RocketMQ 控制台 (Dashboard)
+  dashboard:
+    image: apacherocketmq/rocketmq-dashboard:latest
+    container_name: rmqdashboard
+    ports:
+      - "8070:8080"  # 控制台访问端口
+    environment:
+      - JAVA_OPTS=-Drocketmq.namesrv.addr=namesrv:9876
+    depends_on:
+      - namesrv
+    networks:
+      - rmq
+
+networks:
+  rmq:
+    name: rmq_network
+    driver: bridge

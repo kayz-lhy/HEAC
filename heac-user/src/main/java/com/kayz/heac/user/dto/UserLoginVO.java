@@ -1,4 +1,4 @@
-package com.kayz.heac.common.dto;
+package com.kayz.heac.user.dto;
 
 import lombok.*;
 import lombok.experimental.Accessors;
