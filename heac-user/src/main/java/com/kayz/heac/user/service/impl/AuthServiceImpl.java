@@ -4,8 +4,8 @@ import com.kayz.heac.common.consts.RedisPrefix;
 import com.kayz.heac.common.dto.UserLoginLogDTO;
 import com.kayz.heac.common.exception.AuthException;
 import com.kayz.heac.common.exception.UserActionException;
-import com.kayz.heac.user.dto.UserLoginDTO;
-import com.kayz.heac.user.dto.UserLoginVO;
+import com.kayz.heac.user.domain.dto.UserLoginDTO;
+import com.kayz.heac.user.domain.vo.UserLoginVO;
 import com.kayz.heac.user.entity.User;
 import com.kayz.heac.user.service.AuthService;
 import com.kayz.heac.user.service.TokenService;
@@ -99,6 +99,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String token) {
         tokenService.invalidateToken(token);
+    }
+
+    @Override
+    public UserLoginVO refreshToken(String token, String userId) {
+        if (tokenService.validateToken(token) && tokenService.getUserIdFromToken(token).equals(userId)) {
+            User user = userService.getById(userId);
+            String newToken = tokenService.createAndCacheToken(user);
+            return UserLoginVO.builder()
+                    .userId(user.getId())
+                    .account(user.getAccount())
+                    .token(newToken)
+                    .role(user.isAdmin() ? "ADMIN" : "USER")
+                    .expireIn(tokenService.getAccessTokenExpMinutes())
+                    .build();
+        } else {
+            throw new AuthException("Token 无效或用户不匹配，无法刷新");
+        }
     }
 
 

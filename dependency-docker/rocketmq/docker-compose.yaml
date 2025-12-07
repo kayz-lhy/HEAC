@@ -31,19 +31,6 @@ services:
     networks:
       - rmq
 
-  # RocketMQ 控制台 (Dashboard)
-  dashboard:
-    image: apacherocketmq/rocketmq-dashboard:latest
-    container_name: rmqdashboard
-    ports:
-      - "8070:8080"  # 控制台访问端口
-    environment:
-      - JAVA_OPTS=-Drocketmq.namesrv.addr=namesrv:9876
-    depends_on:
-      - namesrv
-    networks:
-      - rmq
-
 networks:
   rmq:
     name: rmq_network

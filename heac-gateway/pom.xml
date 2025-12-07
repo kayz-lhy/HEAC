@@ -102,6 +102,13 @@
             Common 引入了 starter-validation，它兼容 WebFlux，这里不用额外处理
         -->
 
+
+        <dependency>
+            <groupId>io.github.pig-mesh.ai</groupId>
+            <artifactId>deepseek-spring-boot-starter</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -9,4 +9,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper extends BaseMapper<User> {
     String findUserIdByAccount(String account);
     User findUserByAccount(@NotBlank(message = "账号不能为空") String account);
+
+    String findUserProfileById(String userId);
 }

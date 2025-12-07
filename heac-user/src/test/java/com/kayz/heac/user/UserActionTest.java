@@ -2,9 +2,9 @@ package com.kayz.heac.user;
 
 import com.kayz.heac.common.exception.AuthException;
 import com.kayz.heac.common.exception.UserActionException;
-import com.kayz.heac.user.dto.UserLoginDTO;
-import com.kayz.heac.user.dto.UserLoginVO;
-import com.kayz.heac.user.dto.UserRegisterDTO;
+import com.kayz.heac.user.domain.dto.UserLoginDTO;
+import com.kayz.heac.user.domain.dto.UserRegisterDTO;
+import com.kayz.heac.user.domain.vo.UserLoginVO;
 import com.kayz.heac.user.service.AuthService;
 import com.kayz.heac.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;

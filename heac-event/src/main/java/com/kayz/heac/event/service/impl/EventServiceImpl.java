@@ -1,8 +1,8 @@
 package com.kayz.heac.event.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kayz.heac.common.exception.EventException;
-import com.kayz.heac.common.exception.EventStatusException;
 import com.kayz.heac.event.cache.EventCacheManager;
 import com.kayz.heac.event.dto.EventPublishDTO;
 import com.kayz.heac.event.entity.Event;
@@ -45,9 +45,9 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         }
 
         // 状态流转校验 (可选)
-        if (event.getStatus() != EventStatus.DRAFT && event.getStatus() != EventStatus.WARMUP) {
-            throw new EventStatusException("当前状态不可发布");
-        }
+//        if (event.getStatus() != EventStatus.DRAFT && event.getStatus() != EventStatus.WARMUP) {
+//            throw new EventStatusException("当前状态不可发布:"+event.getStatus());
+//        }
 
         // 1. 更新 DB
         event.setStatus(EventStatus.PUBLISHED);
@@ -71,11 +71,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     @Transactional(rollbackFor = Exception.class)
     public void closeEvent(String id) {
         // 使用 LambdaUpdate 避免先查后改，性能更好
-        boolean success = this.lambdaUpdate()
-                .eq(Event::getId, id)
-                .set(Event::getStatus, EventStatus.CLOSED)
-                .set(Event::getEndTime, LocalDateTime.now())
-                .update();
+        boolean success = this.lambdaUpdate().eq(Event::getId, id).set(Event::getStatus, EventStatus.CLOSED).set(Event::getEndTime, LocalDateTime.now()).update();
 
         if (success) {
             eventCacheManager.invalidate(id);
@@ -87,5 +83,20 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     public Event getDetail(String id) {
         // 走多级缓存
         return eventCacheManager.get(id);
+    }
+
+    @Override
+    public Page<Event> getHotList(int page, int size) {
+        // 创建分页对象
+        Page<Event> pageParam = new Page<>(page, size);
+        // TODO 换成mapper写法以便加缓存
+        // 查询条件：状态必须是 PUBLISHED (进行中) 或 ENDED (已结束)
+        // 排序：按热度倒序，其次按开始时间倒序
+        return this.lambdaQuery().
+                in(Event::getStatus, EventStatus.PUBLISHED, EventStatus.ENDED)
+                .orderByDesc(Event::getHeatScore)
+                .orderByDesc(Event::getStartTime)
+                .page(pageParam);
+
     }
 }

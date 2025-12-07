@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DeveloperToolsToolWindowSettingsV1" lastSelectedContentNodeId="json-text-escape" pluginVersion="7.1.0">
+    <developerToolsConfigurations>
+      <developerToolConfiguration developerToolId="json-schema-validator" id="5b53247a-d8d8-42b4-b185-22eebab37e11" name="Workbench">
+        <properties>
+          <property key="dataText" type="INPUT" value="kotlin.String|{&quot;code&quot;:&quot;200&quot;,&quot;message&quot;:&quot;success&quot;,&quot;data&quot;:{&quot;id&quot;:&quot;d58efbe1-9e14-16d0-b809-7553644ab426&quot;,&quot;title&quot;:&quot;Python自动化测试事件&quot;,&quot;summary&quot;:&quot;这是一个由Python脚本自动创建的高并发测试事件&quot;,&quot;coverImg&quot;:&quot;https://example.com/python_test.jpg&quot;,&quot;status&quot;:&quot;DRAFT&quot;,&quot;heatScore&quot;:0,&quot;startTime&quot;:null,&quot;endTime&quot;:null,&quot;createdBy&quot;:&quot;\&quot;592a3a70-1cbd-424c-a403-02da7fe989a7\&quot;&quot;,&quot;createTime&quot;:&quot;2025-12-05T14:03:54.37914&quot;,&quot;updateTime&quot;:&quot;2025-12-05T14:03:54.379209&quot;,&quot;version&quot;:0,&quot;deleted&quot;:0}}" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="json-text-escape" id="ed3e4ae9-e409-406f-ae74-e91ab01136bb" name="Workbench">
+        <properties>
+          <property key="sourceText" type="INPUT" value="kotlin.String|{&quot;code&quot;:&quot;200&quot;,&quot;message&quot;:&quot;success&quot;,&quot;data&quot;:{&quot;id&quot;:&quot;d58efbe1-9e14-16d0-b809-7553644ab426&quot;,&quot;title&quot;:&quot;Python自动化测试事件&quot;,&quot;summary&quot;:&quot;这是一个由Python脚本自动创建的高并发测试事件&quot;,&quot;coverImg&quot;:&quot;https://example.com/python_test.jpg&quot;,&quot;status&quot;:&quot;DRAFT&quot;,&quot;heatScore&quot;:0,&quot;startTime&quot;:null,&quot;endTime&quot;:null,&quot;createdBy&quot;:&quot;\&quot;592a3a70-1cbd-424c-a403-02da7fe989a7\&quot;&quot;,&quot;createTime&quot;:&quot;2025-12-05T14:03:54.37914&quot;,&quot;updateTime&quot;:&quot;2025-12-05T14:03:54.379209&quot;,&quot;version&quot;:0,&quot;deleted&quot;:0}}" />
+          <property key="targetText" type="INPUT" value="kotlin.String|{\&quot;code\&quot;:\&quot;200\&quot;,\&quot;message\&quot;:\&quot;success\&quot;,\&quot;data\&quot;:{\&quot;id\&quot;:\&quot;d58efbe1-9e14-16d0-b809-7553644ab426\&quot;,\&quot;title\&quot;:\&quot;Python\u81EA\u52A8\u5316\u6D4B\u8BD5\u4E8B\u4EF6\&quot;,\&quot;summary\&quot;:\&quot;\u8FD9\u662F\u4E00\u4E2A\u7531Python\u811A\u672C\u81EA\u52A8\u521B\u5EFA\u7684\u9AD8\u5E76\u53D1\u6D4B\u8BD5\u4E8B\u4EF6\&quot;,\&quot;coverImg\&quot;:\&quot;https:\/\/example.com\/python_test.jpg\&quot;,\&quot;status\&quot;:\&quot;DRAFT\&quot;,\&quot;heatScore\&quot;:0,\&quot;startTime\&quot;:null,\&quot;endTime\&quot;:null,\&quot;createdBy\&quot;:\&quot;\\\&quot;592a3a70-1cbd-424c-a403-02da7fe989a7\\\&quot;\&quot;,\&quot;createTime\&quot;:\&quot;2025-12-05T14:03:54.37914\&quot;,\&quot;updateTime\&quot;:\&quot;2025-12-05T14:03:54.379209\&quot;,\&quot;version\&quot;:0,\&quot;deleted\&quot;:0}}" />
+        </properties>
+      </developerToolConfiguration>
+    </developerToolsConfigurations>
+  </component>
+</project>

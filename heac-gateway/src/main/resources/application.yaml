@@ -38,16 +38,21 @@ spring:
         - id: user-service-route
           uri: lb://heac-user # lb 代表 LoadBalancer，后面接服务名
           predicates:
-            - Path=/api/user/**
-          filters:
-            - StripPrefix=1 # 去掉第一层路径。请求 /api/user/login -> 转发给 user-service 的 /login
+            - Path=/auth/**
+        # 事件服务路由
+        - id: event-service-route
+          uri: lb://heac-event # lb 代表 LoadBalancer，后面接服务名
+          predicates:
+            - Path=/portal/event/**
+            - Path=/admin/event/**
+
 
 # 自定义配置：白名单接口 (不需要 Token 的接口)
 secure:
   ignore:
     urls:
-      - /api/user/login
-      - /api/user/register
+      - /auth/login
+      - /auth/register
       - /doc.html
       - /swagger-ui.html
 
