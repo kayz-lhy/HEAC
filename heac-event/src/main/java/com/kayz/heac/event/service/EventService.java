@@ -1,5 +1,6 @@
 package com.kayz.heac.event.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kayz.heac.event.entity.Event;
 
@@ -37,4 +38,13 @@ public interface EventService extends IService<Event> {
      * @return 事件详情
      */
     Event getDetail(String id);
+
+    /**
+     * 获取热门事件列表
+     *
+     * @param page 页码
+     * @param size 每页大小
+     * @return 热门事件分页列表
+     */
+    Page<Event> getHotList(int page, int size);
 }

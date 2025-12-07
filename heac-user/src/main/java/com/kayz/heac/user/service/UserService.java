@@ -1,18 +1,27 @@
 package com.kayz.heac.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.kayz.heac.common.exception.AuthException;
-import com.kayz.heac.common.exception.UserActionException;
-import com.kayz.heac.user.dto.UserRegisterDTO;
+import com.kayz.heac.user.domain.dto.PasswordUpdateDTO;
+import com.kayz.heac.user.domain.dto.RealNameDTO;
+import com.kayz.heac.user.domain.dto.UserRegisterDTO;
+import com.kayz.heac.user.domain.dto.UserUpdateDTO;
+import com.kayz.heac.user.domain.vo.UserInfoVO;
 import com.kayz.heac.user.entity.User;
 
 public interface UserService extends IService<User> {
+    User validateUserCredentials(String account, String password);
 
-    User validateUserCredentials(String account, String passwordHash) throws AuthException;
+    String register(UserRegisterDTO dto);
 
-    String register(UserRegisterDTO dto) throws UserActionException;
+    UserInfoVO getUserProfile(String userId);
 
-    void updateRealNameStatus(String userId, Boolean realNameStatus);
+    void updateProfile(String userId, UserUpdateDTO dto);
+
+    void changePassword(String userId, PasswordUpdateDTO dto);
+
+    void verifyRealName(String userId, RealNameDTO dto);
 
     void lockUserByAccount(String account);
+
+    void updateRealNameStatus(String userId, Boolean status);
 }

@@ -5,12 +5,20 @@
 <!-- MamMapper.xml: MyBatis-Plus 可扩展 XML 配置示例 -->
 <mapper namespace="com.kayz.heac.user.mapper.UserMapper">
     <select id="findUserIdByAccount" resultType="java.lang.String">
-        SELECT id FROM sys_user WHERE account = #{account}
+        SELECT id
+        FROM sys_user
+        WHERE account = #{account}
     </select>
 
     <select id="findUserByAccount" resultType="com.kayz.heac.user.entity.User">
         SELECT id, account, password_hash, real_name_status, create_time, status, preferences_json, last_login_ip, last_login_time, is_admin, version, deleted
-        FROM sys_user WHERE account = #{account}
+        FROM sys_user
+        WHERE account = #{account}
     </select>
 
+    <select id="findUserProfileById" resultType="java.lang.String">
+        SELECT sys_user.preferences_json
+        FROM sys_user
+        WHERE id = #{userId} AND deleted = 0 LIMIT 1
+    </select>
 </mapper>

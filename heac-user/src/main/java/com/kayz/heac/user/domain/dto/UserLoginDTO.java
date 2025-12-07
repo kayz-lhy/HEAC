@@ -1,4 +1,4 @@
-package com.kayz.heac.user.dto;
+package com.kayz.heac.user.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

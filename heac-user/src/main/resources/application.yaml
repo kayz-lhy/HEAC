@@ -1,92 +1,15 @@
-server:
-  port: 15000
-
 spring:
   application:
     name: heac-user
-    admin:
-      enabled: true
+  profiles:
+    active: dev
   config:
-    import: nacos:heac-user.yaml
-
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 6379
-    mongodb:
-      uri: mongodb://user:password@localhost:27017/heac?authSource=admin
-      auto-index-creation: true
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=public&stringtype=unspecified&timezone=Asia/Shanghai
-    username: user
-    password: password
-
+    # 关键配置：使用 import 导入 Nacos 配置
+    import:
+      - nacos:heac-common.yaml?refresh=true
+      - nacos:heac-user-${spring.profiles.active}.yaml?refresh=true
   cloud:
     nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848  # Nacos 注册中心地址
       config:
-        server-addr: 127.0.0.1:8848  # Nacos 配置中心地址
-
-
-seata:
-  enable-auto-data-source-proxy: true
-  enabled: true
-  application-id: heac-user
-  tx-service-group: heac-user-group
-  service:
-    vgroup-mapping:
-      heac-user-group: default  # 指向 seata-server 默认分组
-
-  client:
-    rm:
-      async-commit-buffer-limit: 10000
-    tm:
-      commit-retry-count: 5
-      rollback-retry-count: 5
-  registry:
-    type: nacos
-    nacos:
-      application: seata-server
-      server-addr: 127.0.0.1:8848
-      group: "SEATA_GROUP"
-      namespace: "public"
-      cluster: default
-# 说明：
-# - registry.type = file：不依赖外部注册中心
-# - store.mode = file：不依赖数据库
-# - client 端只需配置 tx-service-group 和 server 地址
-# - 这是能跑起来 Seata 最小、最简、最少依赖的配置
-
-mybatis-plus:
-  mapperLocations: classpath:mapper/*.xml
-  global-config:
-    db-config:
-      logic-delete-field:
-      logic-delete-value: 1
-      logic-not-delete-value: 0
-
-
-jwt:
-  # 令牌签名密钥 (必须足够复杂)
-  secret: ThisIsASecretKeyForYourHotspotAggregationSystem
-  # Access Token 有效期 (分钟)
-  access-token-expiration-minutes: 60
-  # Redis 存储 JWT 黑名单的 Key 前缀
-  redis-blacklist-prefix: "jwt:blacklist:"
-  # 声明中用于标识用户匿名ID的Key
-  anonymous-id-key: "anonymous_id"
-
-
-rocketmq:
-  name-server: 127.0.0.1:9876 # 你的 RocketMQ 地址
-  producer:
-    # 生产者组名，必须全局唯一
-    group: heac-user-login-log-producer-group
-    # 发送超时时间 (毫秒)
-    send-message-timeout: 30000
-
-logging:
-  level:
-    root: debug
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml

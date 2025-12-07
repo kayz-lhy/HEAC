@@ -14,7 +14,12 @@ public class UserContextInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         // 网关传过来的 ID
         String userId = request.getHeader("X-User-Id");
-
+        String token = request.getHeader("Authorization");
+        if (CharSequenceUtil.isNotBlank(token)) {
+            // 放入 ThreadLocal
+            token = token.substring(8); // 去掉 Bearer 空格
+            UserContext.setToken(token);
+        }
         if (CharSequenceUtil.isNotBlank(userId)) {
             // 放入 ThreadLocal
             UserContext.setUserId(userId);
