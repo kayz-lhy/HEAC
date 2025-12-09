@@ -26,11 +26,7 @@ spring:
       enabled: true
   config:
     import: nacos:heac-event.yaml
-
   data:
-    redis:
-      host: localhost
-      port: 6379
     mongodb:
       uri: mongodb://user:password@tc:27017/heac-event?authSource=admin
       auto-index-creation: true
@@ -38,9 +34,9 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848  # Nacos 注册中心地址
+        server-addr: tc:8848  # Nacos 注册中心地址
       config:
-        server-addr: 127.0.0.1:8848  # Nacos 配置中心地址
+        server-addr: tc:8848  # Nacos 配置中心地址
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres?currentSchema=public&stringtype=unspecified&timezone=Asia/Shanghai
     username: user
@@ -66,7 +62,7 @@ seata:
     type: nacos
     nacos:
       application: seata-server
-      server-addr: 127.0.0.1:8848
+      server-addr: tc:8848
       group: "SEATA_GROUP"
       namespace: "public"
       cluster: default

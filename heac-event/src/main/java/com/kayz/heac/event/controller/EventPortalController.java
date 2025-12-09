@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/portal/event")
+@RequestMapping("/event/portal")
 @RequiredArgsConstructor
 @Tag(name = "前台-围观大厅")
 public class EventPortalController {

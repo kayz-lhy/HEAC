@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/admin/event")
+@RequestMapping("/event/admin")
 @RequiredArgsConstructor
 @Tag(name = "后台-事件管理")
 public class EventAdminController {

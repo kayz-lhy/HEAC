@@ -65,6 +65,19 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             return buildErrorResponse(exchange, "令牌无效或已过期");
         }
 
+
+        // 5. 权限校验 (简单的 RBAC)
+        if (path.contains("/admin/")) {
+            // 从 Redis 获取用户角色 (假设登录时存了 "role": "ADMIN")
+            // Redis Key 结构: auth:token:xxxx -> value (可能是 JSON)
+            Object isAdmin = jwtUtil.getClaimsFromToken(token).get("is_admin");
+
+
+            if ("false".equals(isAdmin)) {
+                return buildErrorResponse(exchange, "无权访问管理员接口");
+            }
+        }
+
         // 4. 校验 Redis (检查是否已注销/踢下线)
         // 注意：这里使用 reactive 的 hasKey，返回的是 Mono<Boolean>
         String redisKey = RedisPrefix.TOKEN_CACHE_PREFIX + token;
@@ -85,6 +98,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                                 return chain.filter(exchange.mutate().request(newRequest).build());
                             });
                 });
+
+
     }
 
     /**

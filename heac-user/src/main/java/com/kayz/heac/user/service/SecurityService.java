@@ -1,9 +1,9 @@
 package com.kayz.heac.user.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kayz.heac.user.domain.dto.LoginLogQueryDTO;
 import com.kayz.heac.user.domain.vo.UserLoginLogVO;
 
-import java.util.List;
-
 public interface SecurityService {
-    List<UserLoginLogVO> getLoginLogs(int pageNum, int pageSize, String userId, String account, String ip, Integer status);
+    Page<UserLoginLogVO> queryLoginLogs(LoginLogQueryDTO dto);
 }

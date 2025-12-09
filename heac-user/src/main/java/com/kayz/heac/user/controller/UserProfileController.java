@@ -7,6 +7,8 @@ import com.kayz.heac.user.domain.dto.RealNameDTO;
 import com.kayz.heac.user.domain.dto.UserUpdateDTO;
 import com.kayz.heac.user.domain.vo.UserInfoVO;
 import com.kayz.heac.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,55 +16,40 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user/profile")
 @RequiredArgsConstructor
+@Tag(name = "C端-个人中心", description = "用户个人资料查询与修改")
 public class UserProfileController {
 
     private final UserService userService;
 
-    /**
-     * 获取我的个人信息
-     */
     @GetMapping("/me")
+    @Operation(summary = "获取当前用户信息", description = "返回头像、昵称、实名状态等脱敏信息")
     public HeacResponse<UserInfoVO> getMyProfile() {
-        // 1. 直接从上下文获取 ID
         String userId = UserContext.getUserId();
-
-        // 2. 读操作通常不需要打印 INFO 日志，否则日志量太大
+        // 这一步如果抛出异常(如用户被删)，全局异常处理器会捕获
         UserInfoVO profile = userService.getUserProfile(userId);
         return HeacResponse.success(profile);
     }
 
-    /**
-     * 更新基础信息 (昵称、头像等)
-     */
     @PutMapping("/update")
+    @Operation(summary = "更新基础资料", description = "修改昵称、头像、简介、偏好设置")
     public HeacResponse<Void> updateMyProfile(@RequestBody @Valid UserUpdateDTO dto) {
         String userId = UserContext.getUserId();
-
         userService.updateProfile(userId, dto);
         return HeacResponse.success();
     }
 
-    /**
-     * 实名认证
-     */
     @PostMapping("/realname")
+    @Operation(summary = "实名认证", description = "提交姓名和身份证号进行认证")
     public HeacResponse<Void> verifyRealName(@RequestBody @Valid RealNameDTO dto) {
         String userId = UserContext.getUserId();
-
-        // 实名认证属于用户属性变更，建议放在 UserService 而不是 AuthService
-        // 且不需要传 Token，Service 只需校验身份证逻辑和修改 DB
         userService.verifyRealName(userId, dto);
         return HeacResponse.success();
     }
 
-    /**
-     * 修改密码
-     */
     @PostMapping("/password")
+    @Operation(summary = "修改密码", description = "修改成功后强制下线")
     public HeacResponse<Void> changePassword(@RequestBody @Valid PasswordUpdateDTO dto) {
         String userId = UserContext.getUserId();
-
-        // 传入旧密码和新密码的 DTO
         userService.changePassword(userId, dto);
         return HeacResponse.success();
     }

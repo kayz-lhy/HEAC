@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(staticName = "empty")
 @Builder
 public class Event implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "主键ID")

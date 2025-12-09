@@ -1,24 +1,18 @@
 package com.kayz.heac.user.domain.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class UserLoginLogVO {
-    @Field("user_id")
-    private String userId;
-    @Field("account")
+    private String id;        // Mongo ID
     private String account;
-    @Field("login_time")
-    private String loginTime;
-    @Field("ip")
     private String ip;
-    @Field("status")
-    private int status;
+    private Integer status;
+
+    // 注意：MongoDB 存的时间是 UTC，Spring 转出来可能是 LocalDateTime
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime loginTime;
 }

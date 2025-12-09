@@ -127,8 +127,5 @@ public abstract class AbstractCacheManager<T> implements EntityCacheManager<T> {
         String key = getCachePrefix() + id;
         redisTemplate.delete(key);
         caffeineCache.invalidate(key);
-
-        // 也可以顺便把锁删了(虽然不需要，因为锁是临时的)
-        // Redisson 的锁是独立的 Key，不影响业务 Key
     }
 }

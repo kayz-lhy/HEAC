@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DeveloperToolsToolWindowSettingsV1" lastSelectedContentNodeId="json-text-escape" pluginVersion="7.1.0">
+  <component name="DeveloperToolsToolWindowSettingsV1" lastSelectedContentNodeId="jwt-encoder-decoder" pluginVersion="7.1.0">
     <developerToolsConfigurations>
       <developerToolConfiguration developerToolId="json-schema-validator" id="5b53247a-d8d8-42b4-b185-22eebab37e11" name="Workbench">
         <properties>
           <property key="dataText" type="INPUT" value="kotlin.String|{&quot;code&quot;:&quot;200&quot;,&quot;message&quot;:&quot;success&quot;,&quot;data&quot;:{&quot;id&quot;:&quot;d58efbe1-9e14-16d0-b809-7553644ab426&quot;,&quot;title&quot;:&quot;Python自动化测试事件&quot;,&quot;summary&quot;:&quot;这是一个由Python脚本自动创建的高并发测试事件&quot;,&quot;coverImg&quot;:&quot;https://example.com/python_test.jpg&quot;,&quot;status&quot;:&quot;DRAFT&quot;,&quot;heatScore&quot;:0,&quot;startTime&quot;:null,&quot;endTime&quot;:null,&quot;createdBy&quot;:&quot;\&quot;592a3a70-1cbd-424c-a403-02da7fe989a7\&quot;&quot;,&quot;createTime&quot;:&quot;2025-12-05T14:03:54.37914&quot;,&quot;updateTime&quot;:&quot;2025-12-05T14:03:54.379209&quot;,&quot;version&quot;:0,&quot;deleted&quot;:0}}" />
+        </properties>
+      </developerToolConfiguration>
+      <developerToolConfiguration developerToolId="jwt-encoder-decoder" id="41194c58-ce9b-4cb3-b4bf-79185d914b5b" name="Workbench">
+        <properties>
+          <property key="headerText" type="INPUT" value="kotlin.String|{&#10;  &quot;alg&quot;: &quot;HS256&quot;&#10;}" />
+          <property key="payloadText" type="INPUT" value="kotlin.String|{&#10;  &quot;sub&quot;: &quot;a9cf33e1-82cf-0f29-80d3-545a863da3bb&quot;,&#10;  &quot;iat&quot;: 1765292443,&#10;  &quot;exp&quot;: 1765296043,&#10;  &quot;is_admin&quot;: false,&#10;  &quot;account&quot;: &quot;Ew#MZ[bja%cX&quot;&#10;}" />
+          <property key="encodedText" type="INPUT" value="kotlin.String|eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhOWNmMzNlMS04MmNmLTBmMjktODBkMy01NDVhODYzZGEzYmIiLCJpYXQiOjE3NjUyOTI0NDMsImV4cCI6MTc2NTI5NjA0MywiaXNfYWRtaW4iOmZhbHNlLCJhY2NvdW50IjoiRXcjTVpbYmphJWNYIn0.KQcfXauXizTqYC3W-x4B3PmvXOi_ef91T3VM-imoSDg" />
         </properties>
       </developerToolConfiguration>
       <developerToolConfiguration developerToolId="json-text-escape" id="ed3e4ae9-e409-406f-ae74-e91ab01136bb" name="Workbench">
@@ -14,5 +21,6 @@
         </properties>
       </developerToolConfiguration>
     </developerToolsConfigurations>
+    <expandedGroupNodeIds />
   </component>
 </project>

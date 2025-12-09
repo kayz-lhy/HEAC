@@ -6,65 +6,12 @@ spring:
     name: heac-gateway
   config:
     import: nacos:heac-gateway.yaml
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password:
-      database: 0
-
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848
-
-
-    gateway:
-      # --- 跨域配置 (CORS) ---
-      globalcors:
-        add-to-simple-url-handler-mapping: true
-        cors-configurations:
-          '[/**]': # 拦截所有请求
-            allowedMethods: "*"
-            allowedHeaders: "*"
-            allowCredentials: true
-            allowedOriginPatterns:
-              - "http://localhost:*"
-
-      # --- 路由配置 ---
-      routes:
-        # 用户服务路由
-        - id: user-service-route
-          uri: lb://heac-user # lb 代表 LoadBalancer，后面接服务名
-          predicates:
-            - Path=/auth/**
-        # 事件服务路由
-        - id: event-service-route
-          uri: lb://heac-event # lb 代表 LoadBalancer，后面接服务名
-          predicates:
-            - Path=/portal/event/**
-            - Path=/admin/event/**
-
-
-# 自定义配置：白名单接口 (不需要 Token 的接口)
-secure:
-  ignore:
-    urls:
-      - /auth/login
-      - /auth/register
-      - /doc.html
-      - /swagger-ui.html
-
-
-jwt:
-  # 令牌签名密钥 (必须足够复杂)
-  secret: ThisIsASecretKeyForYourHotspotAggregationSystem
-  # Access Token 有效期 (分钟)
-  accessTokenExpirationMinute: 60
-
-
-logging:
-  # 这是一个非常干净的日志格式，没有 TraceID 占位符
-  pattern:
-    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} : %m%n"
+        server-addr: tc:8848
+        username: nacos
+        password: nacos
+      config:
+        server-addr: tc:8848
+        file-extension: yaml
