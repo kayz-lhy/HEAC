@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RocketMQMessageListener(
         topic = "user-topic",
-        consumerGroup = "heac-user-login-log-group",
+        consumerGroup = "heac-user-login-log-group-dev",
         selectorExpression = "login || login-failure" // 只接收 login 和 login-failure 标签
 )
 @Component

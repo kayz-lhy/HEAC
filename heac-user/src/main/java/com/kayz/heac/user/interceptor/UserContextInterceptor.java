@@ -5,9 +5,13 @@ import cn.hutool.core.text.CharSequenceUtil;
 import com.kayz.heac.common.context.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @SuppressWarnings("unused")
+@Component
+@Slf4j
 public class UserContextInterceptor implements HandlerInterceptor {
 
     @Override
@@ -15,9 +19,13 @@ public class UserContextInterceptor implements HandlerInterceptor {
         // 网关传过来的 ID
         String userId = request.getHeader("X-User-Id");
         String token = request.getHeader("Authorization");
+
+        log.warn("token = " + token);
+        log.warn("id = " + userId);
+
         if (CharSequenceUtil.isNotBlank(token)) {
             // 放入 ThreadLocal
-            token = token.substring(8); // 去掉 Bearer 空格
+            token = token.substring(7); // 去掉 Bearer 空格
             UserContext.setToken(token);
         }
         if (CharSequenceUtil.isNotBlank(userId)) {

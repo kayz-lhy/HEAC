@@ -1,131 +1,106 @@
 package com.kayz.heac.user.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.kayz.heac.user.enums.RealNameStatus;
+import com.kayz.heac.user.enums.UserStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.sql.Timestamp;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
-/**
- * User 实体（完全适配 PostgreSQL + MyBatis-Plus）
- * 注意点：
- * 1. PostgreSQL 没有 datetime，只能使用 timestamp 类型 —— 对应 Java LocalDateTime。
- * 2. UUID 用 @TableId(type = IdType.ASSIGN_UUID)。
- * 3. 枚举使用字符串存储（@EnumValue）。
- * 4. JSONB 推荐使用 String 存储 + TypeHandler（你后续可加）。
- */
-@TableName("sys_user")
 @Data
-@Accessors(chain = true)
-@AllArgsConstructor(access = AccessLevel.PUBLIC, staticName = "of")
-@NoArgsConstructor(access = AccessLevel.PUBLIC, staticName = "empty")
 @Builder
-public class User {
+@Accessors(chain = true)
+@AllArgsConstructor(staticName = "of")
+@NoArgsConstructor(staticName = "empty")
+@TableName(value = "sys_user", autoResultMap = true) // 开启 ResultMap 以支持 JSONB
+@Schema(description = "系统用户核心实体")
+public class User implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键 ID
-     */
+    /* ------------------- 核心身份 ------------------- */
     @TableId(type = IdType.ASSIGN_UUID)
+    @Schema(description = "用户ID (UUID)")
     private String id;
 
-    /**
-     * 登录账号（手机号/邮箱）
-     */
-    @TableField("account")
+    @Schema(description = "登录账号 (唯一)")
     private String account;
 
-    /**
-     * 密码哈希
-     */
-    @TableField("password_hash")
+    @Schema(description = "密码凭证 (BCrypt加密)")
+    @TableField(select = false) // 默认查询不带出密码，提升安全性
     private String passwordHash;
 
-    /**
-     * 实名状态（枚举字符串）
-     */
-    @TableField("real_name_status")
-    private VerificationStatus realNameStatus;
+    @Schema(description = "手机号 (唯一/加密存储)")
+    private String mobile;
 
-    /**
-     * 注册时间（PostgreSQL timestamp <-> LocalDateTime）
-     */
-    @TableField("create_time")
-    private Timestamp createTime;
+    @Schema(description = "邮箱")
+    private String email;
 
-    /**
-     * 用户状态
-     */
-    @TableField("status")
+    /* ------------------- 公开画像 ------------------- */
+    @Schema(description = "用户昵称")
+    private String nickname;
+
+    @Schema(description = "头像URL")
+    @TableField(fill = FieldFill.INSERT)
+    private String avatar;
+
+    @Schema(description = "个人简介")
+    private String bio;
+
+    /* ------------------- 实名与合规 ------------------- */
+    @Schema(description = "实名认证状态")
+    private RealNameStatus realNameStatus;
+
+    @Schema(description = "真实姓名 (脱敏/加密)")
+    private String realName;
+
+    /* ------------------- 状态与风控 ------------------- */
+    @Schema(description = "账号状态 (NORMAL/LOCKED/BANNED)")
     private UserStatus status;
 
-    /**
-     * 偏好设置 JSON（字符串形式，数据库字段为 JSONB）
-     */
-    @TableField("preferences_json")
-    private String preferencesJson;
+    @Schema(description = "锁定截止时间 (风控临时封禁使用)")
+    private LocalDateTime lockTime;
 
-    /**
-     * 最近登录 IP
-     */
-    @TableField("last_login_ip")
+    @Schema(description = "注册IP")
+    private String registerIp;
+
+    @Schema(description = "最后登录IP")
     private String lastLoginIp;
 
-    /**
-     * 最近登录时间
-     */
-    @TableField("last_login_time")
-    private Timestamp lastLoginTime;
+    @Schema(description = "最后登录时间")
+    private LocalDateTime lastLoginTime;
 
-    /**
-     * 是否管理员
-     */
-    @TableField("is_admin")
-    private boolean isAdmin;
+    /* ------------------- 扩展属性 (PG JSONB) ------------------- */
+    @Schema(description = "用户偏好设置 (JSONB)")
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> preferences;
 
-    /**
-     * 乐观锁
-     */
-    @TableField("version")
+    @Schema(description = "用户标签 (JSONB, 如: VIP, 媒体, 风险用户)")
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> tags;
+
+    /* ------------------- 审计字段 ------------------- */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+
+    @Version
+    @TableField(fill = FieldFill.INSERT)
     private Integer version;
 
-    /**
-     * 逻辑删除（0/1）
-     */
-    @TableLogic(value = "deleted", delval = "1")
+    @TableLogic
+    @TableField(fill = FieldFill.INSERT)
     private Integer deleted;
-
-    /**
-     * 实名校验枚举
-     */
-    @Getter
-    public enum VerificationStatus {
-        UNVERIFIED("UNVERIFIED"),
-        VERIFIED("VERIFIED");
-
-        @EnumValue
-        private final String value;
-
-        VerificationStatus(String value) {
-            this.value = value;
-        }
-
-    }
-
-    /**
-     * 用户状态枚举
-     */
-    @Getter
-    public enum UserStatus {
-        NORMAL("NORMAL"),
-        FROZEN("FROZEN"),
-        BANNED("BANNED");
-
-        @EnumValue
-        private final String value;
-
-        UserStatus(String value) {
-            this.value = value;
-        }
-
-    }
 }

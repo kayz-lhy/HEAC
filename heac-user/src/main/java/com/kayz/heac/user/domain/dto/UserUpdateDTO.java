@@ -1,17 +1,26 @@
 package com.kayz.heac.user.domain.dto;
 
-import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
+
+import java.io.Serializable;
 
 @Data
-public class UserUpdateDTO {
-    @Size(max = 20, message = "昵称过长")
+@Schema(description = "用户资料更新参数")
+public class UserUpdateDTO implements Serializable {
+
+    @Schema(description = "新昵称")
+    @Length(max = 20, message = "昵称最长20个字符")
     private String nickname;
 
-    private String avatar; // 头像URL
+    @Schema(description = "新头像URL")
+    private String avatar;
 
-    private String bio; // 个人简介
+    @Schema(description = "个人简介")
+    @Length(max = 200, message = "简介最长200个字符")
+    private String bio;
 
-    private String preferences; // 偏好设置 JSON
+    @Schema(description = "偏好设置JSON字符串")
+    private String preferences;
 }
-

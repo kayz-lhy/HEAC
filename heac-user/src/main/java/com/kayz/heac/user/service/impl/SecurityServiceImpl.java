@@ -31,13 +31,13 @@ public class SecurityServiceImpl implements SecurityService {
         Query query = new Query();
 
         // 动态拼接条件 (注意 MongoDB 字段名要和 Document 类里 @Field 对应)
-        if (dto.getUserId() != null) {
+        if (dto.getUserId() != null && !dto.getUserId().isBlank()) {
             query.addCriteria(Criteria.where("user_id").is(dto.getUserId()));
         }
-        if (dto.getAccount() != null) {
+        if (dto.getAccount() != null && !dto.getAccount().isBlank()) {
             query.addCriteria(Criteria.where("account").is(dto.getAccount()));
         }
-        if (dto.getIp() != null) {
+        if (dto.getIp() != null && !dto.getIp().isBlank()) {
             query.addCriteria(Criteria.where("ip").is(dto.getIp())); // 注意你的字段名是 ip 还是 ip_address
         }
         if (dto.getStatus() != null) {

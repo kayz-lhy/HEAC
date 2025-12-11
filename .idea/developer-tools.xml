@@ -10,8 +10,8 @@
       <developerToolConfiguration developerToolId="jwt-encoder-decoder" id="41194c58-ce9b-4cb3-b4bf-79185d914b5b" name="Workbench">
         <properties>
           <property key="headerText" type="INPUT" value="kotlin.String|{&#10;  &quot;alg&quot;: &quot;HS256&quot;&#10;}" />
-          <property key="payloadText" type="INPUT" value="kotlin.String|{&#10;  &quot;sub&quot;: &quot;a9cf33e1-82cf-0f29-80d3-545a863da3bb&quot;,&#10;  &quot;iat&quot;: 1765292443,&#10;  &quot;exp&quot;: 1765296043,&#10;  &quot;is_admin&quot;: false,&#10;  &quot;account&quot;: &quot;Ew#MZ[bja%cX&quot;&#10;}" />
-          <property key="encodedText" type="INPUT" value="kotlin.String|eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhOWNmMzNlMS04MmNmLTBmMjktODBkMy01NDVhODYzZGEzYmIiLCJpYXQiOjE3NjUyOTI0NDMsImV4cCI6MTc2NTI5NjA0MywiaXNfYWRtaW4iOmZhbHNlLCJhY2NvdW50IjoiRXcjTVpbYmphJWNYIn0.KQcfXauXizTqYC3W-x4B3PmvXOi_ef91T3VM-imoSDg" />
+          <property key="payloadText" type="INPUT" value="kotlin.String|{&#10;  &quot;sub&quot;: &quot;cad84dd749eed14911ba9fcf2b53a046&quot;,&#10;  &quot;iat&quot;: 1765306931,&#10;  &quot;exp&quot;: 1765310531,&#10;  &quot;is_admin&quot;: false,&#10;  &quot;account&quot;: &quot;admin&quot;&#10;}" />
+          <property key="encodedText" type="INPUT" value="kotlin.String|eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjYWQ4NGRkNzQ5ZWVkMTQ5MTFiYTlmY2YyYjUzYTA0NiIsImlhdCI6MTc2NTMwNjkzMSwiZXhwIjoxNzY1MzEwNTMxLCJpc19hZG1pbiI6ZmFsc2UsImFjY291bnQiOiJhZG1pbiJ9.ovP0kgEOX2zmuUv6c2cOOImMoSygPGTwspSNvRX-dj0" />
         </properties>
       </developerToolConfiguration>
       <developerToolConfiguration developerToolId="json-text-escape" id="ed3e4ae9-e409-406f-ae74-e91ab01136bb" name="Workbench">

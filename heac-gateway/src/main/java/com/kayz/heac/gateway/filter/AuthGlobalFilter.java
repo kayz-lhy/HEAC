@@ -77,6 +77,9 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                 return buildErrorResponse(exchange, "无权访问管理员接口");
             }
         }
+        if (path.contains("/inner/")) {
+            return buildErrorResponse(exchange, "Forbidden: Internal Access Only");
+        }
 
         // 4. 校验 Redis (检查是否已注销/踢下线)
         // 注意：这里使用 reactive 的 hasKey，返回的是 Mono<Boolean>
@@ -92,6 +95,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                             .flatMap(userId -> {
                                 // 6. 【关键】将 UserId 传递给下游微服务
                                 // 下游服务不再解析 Token，直接读取 X-User-Id 头
+
                                 ServerHttpRequest newRequest = request.mutate()
                                         .header("X-User-Id", userId)
                                         .build();

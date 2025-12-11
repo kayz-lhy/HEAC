@@ -1,5 +1,8 @@
 package com.kayz.heac.user.job;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.kayz.heac.user.domain.dto.LockUserDTO;
+import com.kayz.heac.user.entity.User;
 import com.kayz.heac.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +29,7 @@ public class SecurityMonitorJob extends QuartzJobBean {
 
     private final MongoTemplate mongoTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final UserService userService; // 用于修改数据库状态
-
+    private final UserService userService;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -57,9 +59,11 @@ public class SecurityMonitorJob extends QuartzJobBean {
 
         for (Map map : results) {
             String ip = (String) map.get("_id");
+
+            // 写入 Redis 黑名单
             String key = IP_BLACKLIST_KEY + ip;
-            // 封禁 1 小时
             if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+                // 封禁 1 小时
                 redisTemplate.opsForValue().set(key, "SystemBlock", 1, TimeUnit.HOURS);
                 log.warn("【风控触发】封禁异常 IP: {}", ip);
             }
@@ -67,7 +71,7 @@ public class SecurityMonitorJob extends QuartzJobBean {
     }
 
     /**
-     * 策略 B: 同一 账号 失败超过 5 次 -> 锁定账号 (数据库 status)
+     * 策略 B: 同一 账号 失败超过 5 次 -> 锁定账号 (调用 UserService)
      */
     private void scanAndLockAccounts(LocalDateTime startTime) {
         // 1. 聚合查询：按 account 分组，统计失败次数
@@ -85,9 +89,27 @@ public class SecurityMonitorJob extends QuartzJobBean {
 
             log.warn("【风控触发】账号 {} 近期失败 {} 次，准备锁定", account, count);
 
-            // 2. 调用 Service 修改数据库状态
-            // 注意：这里需要你自己实现一个根据 account 锁定的方法
-            userService.lockUserByAccount(account);
+            // 2. 根据账号查询用户实体 (获取 ID)
+            User user = userService.getOne(new LambdaQueryWrapper<User>()
+                    .eq(User::getAccount, account)
+                    .select(User::getId)); // 性能优化：只查 ID 字段即可
+
+            if (user != null) {
+                // 3. 组装 DTO
+                LockUserDTO lockDTO = new LockUserDTO();
+                lockDTO.setUserId(user.getId());
+                lockDTO.setReason("系统风控：短时间内多次登录失败");
+                lockDTO.setDurationMinutes(60); // 自动锁定 1 小时
+
+                // 4. 调用 Service 执行锁定 (修改 DB状态 + 踢下线)
+                try {
+                    userService.lockUser(lockDTO);
+                } catch (Exception e) {
+                    log.error("自动锁定账号失败: {}", account, e);
+                }
+            } else {
+                log.warn("风控扫描发现不存在的账号: {}，可能是恶意随机撞库", account);
+            }
         }
     }
 }

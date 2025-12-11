@@ -17,6 +17,7 @@ public class GlobalExceptionHandler {
     public HeacResponse<Void> handleUserActionException(UserActionException e) {
         // 业务异常通常是预期的，打印 WARN 即可，不打堆栈
         log.warn("用户操作异常: {}", e.getMessage());
+
         return HeacResponse.error(400, e.getMessage());
     }
 
@@ -25,6 +26,7 @@ public class GlobalExceptionHandler {
     public HeacResponse<Void> handleAuthException(AuthException e) {
         // 业务异常通常是预期的，打印 WARN 即可，不打堆栈
         log.warn("认证失败: {}", e.getMessage());
+        e.printStackTrace();
         return HeacResponse.error(401, e.getMessage());
     }
 

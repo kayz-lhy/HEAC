@@ -2,41 +2,47 @@ package com.kayz.heac.event.controller;
 
 import com.kayz.heac.common.entity.HeacResponse;
 import com.kayz.heac.common.entity.PageResult;
-import com.kayz.heac.event.entity.Event;
+import com.kayz.heac.event.domain.dto.EventQueryDTO;
+import com.kayz.heac.event.domain.vo.EventPortalVO;
 import com.kayz.heac.event.service.EventService;
-import com.kayz.heac.event.util.PageUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 前台围观大厅控制器
+ * 面向 C 端海量用户，核心接口均经过多级缓存优化
+ */
 @RestController
 @RequestMapping("/event/portal")
 @RequiredArgsConstructor
-@Tag(name = "前台-围观大厅")
+@Validated // 开启参数校验
+@Tag(name = "C端-围观大厅", description = "热门事件列表与详情查询")
 public class EventPortalController {
 
     private final EventService eventService;
 
     @GetMapping("/{id}")
-    @Operation(summary = "获取事件详情(走多级缓存)")
-    public HeacResponse<Event> getDetail(@PathVariable String id) {
-        // 这个方法内部走了 Caffeine -> Redis -> DB
-        Event event = eventService.getDetail(id);
-        return HeacResponse.success(event);
+    @Operation(summary = "获取事件详情", description = "高并发接口，走 Caffeine+Redis 多级缓存")
+    public HeacResponse<EventPortalVO> getPortalDetail(@PathVariable String id) {
+        return HeacResponse.success(eventService.getPortalDetail(id));
     }
 
     @GetMapping("/hot-list")
-    @Operation(summary = "热门围观列表")
-    public HeacResponse<PageResult<Event>> getHotList(@RequestParam(defaultValue = "1") int page,
-                                                      @RequestParam(defaultValue = "20") int size) {
-        // TODO 这里的查询未来可以用 Redis ZSet 优化，目前先走 DB 分页
-        PageResult<Event> res = PageUtils.toPageResult(eventService.getHotList(page, size));
-        return HeacResponse.success(res);
-    }
+    @Operation(summary = "热门围观列表", description = "按热度值倒序，支持标签筛选")
+    public HeacResponse<PageResult<EventPortalVO>> getHotList(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String tag) {
 
-    @GetMapping("/test")
-    public HeacResponse<String> test() {
-        return HeacResponse.success("Event Portal Service is running!");
+        // 构造查询对象，复用 Service 层的 query 逻辑
+        EventQueryDTO query = new EventQueryDTO();
+        query.setPage(page);
+        query.setSize(size);
+        query.setTag(tag);
+
+        return HeacResponse.success(eventService.getHotList(query));
     }
 }

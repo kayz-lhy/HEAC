@@ -4,88 +4,111 @@ import com.kayz.heac.common.consts.RedisPrefix;
 import com.kayz.heac.common.util.JwtUtil;
 import com.kayz.heac.user.entity.User;
 import com.kayz.heac.user.service.TokenService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
 
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public TokenServiceImpl(JwtUtil jwtUtil, RedisTemplate<String, Object> redisTemplate) {
-        this.jwtUtil = jwtUtil;
-        this.redisTemplate = redisTemplate;
-    }
+    // 反向索引 Key 前缀: user:token:{userId} -> Set<token>
+    private static final String USER_TOKEN_INDEX_PREFIX = "user:token:";
 
     @Override
     public String createAndCacheToken(User user) {
         // 1. 准备 Payload (Claims)
-        // 把 User 对象里的关键信息提取出来，转成 Map
-        // 纯净版 JwtUtil 不认识 User 类，只认识 Map
         Map<String, Object> claims = new HashMap<>();
-        claims.put("is_admin", user.isAdmin()); // 放入你需要的额外字段
         claims.put("account", user.getAccount());
 
-        // 2. 调用纯净版 JwtUtil 生成 Token
+        // 适配新 Entity: 判断是否管理员 (简单逻辑：看 tags 是否包含 ADMIN)
+        boolean isAdmin = user.getTags() != null && user.getTags().contains("ADMIN");
+        claims.put("is_admin", isAdmin);
+
+        // 2. 生成 JWT
         String token = jwtUtil.createToken(user.getId(), claims);
 
-        // 3. 存入 Redis (白名单/会话模式)
-        // Key: "auth:token:xxxx", Value: userId
-        // 这一步是 TokenService 的核心职责：管理 Token 的状态
-        String redisKey = RedisPrefix.TOKEN_CACHE_PREFIX + token;
+        // 3. 存入 Redis (Token -> UserId)
+        String tokenKey = RedisPrefix.TOKEN_CACHE_PREFIX + token;
+        long expire = jwtUtil.getAccessTokenExpMinute();
 
-        // 注意：这里使用了 jwtUtil.getAccessTokenExpMinute()，确保 Redis 过期时间与 JWT 一致
-        redisTemplate.opsForValue().set(
-                redisKey,
-                user.getId(),
-                jwtUtil.getAccessTokenExpMinute(),
-                TimeUnit.MINUTES
-        );
+        redisTemplate.opsForValue().set(tokenKey, user.getId(), expire, TimeUnit.MINUTES);
+
+        // 4. [新增] 维护反向索引 (UserId -> Set<Token>)
+        // 目的：为了实现 invalidateByUserId (封禁踢人)
+        String indexKey = USER_TOKEN_INDEX_PREFIX + user.getId();
+        redisTemplate.opsForSet().add(indexKey, token);
+        redisTemplate.expire(indexKey, expire, TimeUnit.MINUTES);
 
         return token;
     }
 
     @Override
     public boolean validateToken(String token) {
-        // 1. 校验签名和时间 (纯计算，不查库)
         if (!jwtUtil.validateToken(token)) {
             return false;
         }
-
-        // 2. 校验 Redis (状态校验)
-        // 如果 Redis 里没有这个 Key，说明用户已登出或被踢下线，即使 JWT 没过期也视为无效
         return Boolean.TRUE.equals(redisTemplate.hasKey(RedisPrefix.TOKEN_CACHE_PREFIX + token));
     }
 
     @Override
     public void invalidateToken(String token) {
-        // 登出逻辑：直接删除 Redis Key
-        // 纯净版 JwtUtil 不需要知道怎么注销，这里直接操作 Redis 即可
-        redisTemplate.delete(RedisPrefix.TOKEN_CACHE_PREFIX + token);
+        String tokenKey = RedisPrefix.TOKEN_CACHE_PREFIX + token;
+
+        // 1. 先查 userId (为了清理反向索引)
+        Object userIdObj = redisTemplate.opsForValue().get(tokenKey);
+
+        // 2. 删除主 Key
+        log.info("删除TOKEN结果:", redisTemplate.delete(tokenKey));
+
+        // 3. 清理反向索引
+        if (userIdObj != null) {
+            String indexKey = USER_TOKEN_INDEX_PREFIX + userIdObj.toString();
+            redisTemplate.opsForSet().remove(indexKey, token);
+        }
+    }
+
+    /**
+     * 按用户ID踢下线 (封禁时使用)
+     */
+    @Override
+    public void invalidateByUserId(String userId) {
+        String indexKey = USER_TOKEN_INDEX_PREFIX + userId;
+
+        // 1. 获取该用户所有活跃的 Token
+        Set<Object> tokens = redisTemplate.opsForSet().members(indexKey);
+
+        if (tokens != null && !tokens.isEmpty()) {
+            // 2. 遍历删除所有 Token Key
+            for (Object tokenObj : tokens) {
+                String token = tokenObj.toString();
+                redisTemplate.delete(RedisPrefix.TOKEN_CACHE_PREFIX + token);
+            }
+            // 3. 删除反向索引 Key
+            redisTemplate.delete(indexKey);
+            log.info("强制踢用户下线: {}, 清理 Token 数: {}", userId, tokens.size());
+        }
     }
 
     @Override
-    public Long getAccessTokenExpMinutes() {
-        return jwtUtil.getAccessTokenExpMinute();
+    public Long getExpireSeconds() {
+        // 将分钟转为秒返回，方便 VO 展示
+        return jwtUtil.getAccessTokenExpMinute() * 60;
     }
 
     @Override
     public String getUserIdFromToken(String token) {
-        // 策略：优先查 Redis，确保 Token 是活着的
         Object userId = redisTemplate.opsForValue().get(RedisPrefix.TOKEN_CACHE_PREFIX + token);
-
-        if (userId != null) {
-            return userId.toString();
-        }
-
-        // 兜底：如果 Redis 查不到 (理论上不应该发生，除非 Redis 挂了或策略改变)，
-        // 可以尝试从 JWT 字符串反解析，但这取决于你的安全策略。
-        // 这里保持你原本的逻辑：查不到就返回 null
-        return null;
+        return userId != null ? userId.toString() : null;
     }
 }

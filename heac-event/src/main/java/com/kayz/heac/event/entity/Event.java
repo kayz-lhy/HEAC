@@ -1,6 +1,7 @@
 package com.kayz.heac.event.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.kayz.heac.event.enums.EventStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -12,9 +13,10 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-@TableName("sys_event")
+@TableName(value = "sys_event", autoResultMap = true)
 @Schema(description = "热点事件元数据")
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor(staticName = "empty")
@@ -49,6 +51,10 @@ public class Event implements Serializable {
     @TableField("heat_score")
     private Long heatScore;
 
+    @Schema(description = "事件标签列表")
+    @TableField(typeHandler = JacksonTypeHandler.class) // 2. 指定类型处理器
+    private List<String> tags;
+
     @Schema(description = "开始围观时间")
     @TableField("start_time")
     private LocalDateTime startTime;
@@ -56,6 +62,25 @@ public class Event implements Serializable {
     @Schema(description = "结束围观时间")
     @TableField("end_time")
     private LocalDateTime endTime;
+
+    @Schema(description = "来源类型 (ORIGINAL/WEIBO/...)")
+    private String sourceType;
+
+    @Schema(description = "原文链接")
+    private String sourceUrl;
+
+    @Schema(description = "原作者 (外部)")
+    private String originalAuthor;
+
+    @Schema(description = "发布者昵称 (冗余)")
+    private String publisherName;
+
+    @Schema(description = "发布者头像 (冗余)")
+    private String publisherAvatar;
+
+
+
+
 
     /* ---------------- 审计字段 (自动填充) ---------------- */
 

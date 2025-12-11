@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,9 +53,9 @@ public class UserLoginInfoSyncJob extends QuartzJobBean {
             timeEntries.forEach((userIdObj, timeStrObj) -> {
                 String userId = (String) userIdObj;
 
-                User user = User.empty()
-                        .setId(userId)
-                        .setLastLoginTime((Timestamp) timeStrObj);
+                User user = User.builder()
+                        .id(userId)
+                        .lastLoginTime((LocalDateTime) timeStrObj).build();
 
                 updateList.add(user);
                 processedUserIds.add(userId);

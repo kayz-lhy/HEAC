@@ -1,20 +1,20 @@
 package com.kayz.heac.user.domain.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@Accessors(chain = true)
-@Builder
-@AllArgsConstructor(access = AccessLevel.PUBLIC, staticName = "of")
-@NoArgsConstructor(access = AccessLevel.PUBLIC, staticName = "empty")
+@Schema(description = "用户登录参数")
 public class UserLoginDTO implements Serializable {
+
+    @Schema(description = "账号/手机号", example = "admin")
     @NotBlank(message = "账号不能为空")
     private String account;
 
+    @Schema(description = "密码", example = "123456")
     @NotBlank(message = "密码不能为空")
     private String password;
 }

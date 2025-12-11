@@ -1,4 +1,4 @@
-package com.kayz.heac.user.domain.vo;
+package com.kayz.heac.common.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
