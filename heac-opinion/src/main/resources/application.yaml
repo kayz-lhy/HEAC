@@ -1,13 +1,14 @@
 spring:
   application:
-    name: heac-user
+    name: heac-opinion
   profiles:
     active: dev
   config:
     # 关键配置：使用 import 导入 Nacos 配置
     import:
       - nacos:heac-common.yaml?refresh=true
-      - nacos:heac-user-${spring.profiles.active}.yaml?refresh=true
+      - nacos:heac-opinion-${spring.profiles.active}.yaml?refresh=true
+      - nacos:logback-spring.xml?refresh=true
   cloud:
     nacos:
       config:
@@ -17,8 +18,3 @@ spring:
         server-addr: tc:8848
         username: nacos
         password: nacos
-    sentinel:
-      transport:
-        dashboard: 101.43.142.153:8858 #配置Sentinel dashboard地址
-        client-ip: 127.0.0.1
-      enabled: true

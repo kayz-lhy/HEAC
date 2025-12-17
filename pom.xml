@@ -25,6 +25,7 @@
         <module>heac-user</module>
         <module>heac-common</module>
         <module>heac-event</module>
+        <module>heac-opinion</module>
     </modules>
 
     <properties>
@@ -48,7 +49,7 @@
         <!-- ========================================================== -->
         <mybatis-plus.version>3.5.14</mybatis-plus.version>
         <postgresql.version>42.7.3</postgresql.version> <!-- 推荐使用兼容性更好的稳定版 -->
-        <druid.version>1.2.23</druid.version>
+        <druid.version>1.2.27</druid.version>
         <rocketmq.version>2.3.4</rocketmq.version>
 
         <!-- ========================================================== -->
@@ -109,10 +110,14 @@
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-3-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
-
             <!-- JWT -->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -142,6 +147,12 @@
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
                 <version>${caffeine.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.alibaba.csp</groupId>
+                <artifactId>sentinel-annotation-aspectj</artifactId>
             </dependency>
         </dependencies>
     </dependencyManagement>

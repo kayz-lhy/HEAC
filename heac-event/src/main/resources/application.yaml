@@ -25,7 +25,8 @@ spring:
     admin:
       enabled: true
   config:
-    import: nacos:heac-event.yaml
+    import:
+      - nacos:heac-event.yaml?refresh=true
   data:
     mongodb:
       uri: mongodb://user:password@tc:27017/heac-event?authSource=admin
@@ -35,12 +36,38 @@ spring:
     nacos:
       discovery:
         server-addr: tc:8848  # Nacos 注册中心地址
+        username: nacos
+        password: nacos
       config:
         server-addr: tc:8848  # Nacos 配置中心地址
+        file-extension: yaml
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=public&stringtype=unspecified&timezone=Asia/Shanghai
-    username: user
-    password: password
+    # type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      url: jdbc:postgresql://tc:5432/postgres?currentSchema=public&stringtype=unspecified&timezone=Asia/Shanghai
+      username: user
+      password: password
+      driver-class-name: org.postgresql.Driver
+      # 连接池大小调优
+      initial-size: 5       # 初始化连接数
+      min-idle: 5           # 最小空闲连接数
+      max-active: 20        # 最大活跃连接数
+      max-wait: 60000       # 获取连接等待超时时间(ms)
+
+      # 检测与避坑配置
+      time-between-eviction-runs-millis: 60000  # 检测空闲连接的时间间隔
+      min-evictable-idle-time-millis: 300000    # 连接在池中最小生存时间
+      validation-query: SELECT 1                # 检测连接是否有效的SQL
+      test-while-idle: true                     # 申请连接时检测，建议开启
+      test-on-borrow: false                     # 借出时检测，生产环境务必关闭
+      test-on-return: false                     # 归还时检测，关闭
+
+      # 针对 MySQL 的 PSCache 优化 (建议关闭以防 OOM)
+      pool-prepared-statements: false
+
+      # 插件配置：开启监控(stat)、防火墙(wall)、日志(slf4j)
+      filters: stat,wall,slf4j
+
 
 
 seata:

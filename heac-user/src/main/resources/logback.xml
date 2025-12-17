@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--
+       配色方案 (Dark Mode 优化):
+       时间:   Bold Yellow (高亮黄) - 醒目，一眼看到时间
+       线程:   Bold Magenta (高亮洋红) - 区分度高
+       级别:   Highlight (自动变色) - INFO为蓝/绿，WARN为红等
+       类名:   Bold Cyan (高亮青) - 清晰清爽，类似代码高亮
+       消息:   White (白) - 正文保持高对比度白色
+    -->
+    <property name="NEON_LOG_PATTERN"
+              value="%boldYellow(%d{HH:mm:ss}) %boldMagenta([%thread]) %highlight(%-5level) %boldCyan(%logger{20}) - %msg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${NEON_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
