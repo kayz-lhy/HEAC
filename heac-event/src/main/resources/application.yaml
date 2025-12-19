@@ -68,32 +68,6 @@ spring:
       # 插件配置：开启监控(stat)、防火墙(wall)、日志(slf4j)
       filters: stat,wall,slf4j
 
-
-
-seata:
-  enable-auto-data-source-proxy: true
-  enabled: true
-  application-id: heac-user
-  tx-service-group: heac-user-group
-  service:
-    vgroup-mapping:
-      heac-user-group: default  # 指向 seata-server 默认分组
-
-  client:
-    rm:
-      async-commit-buffer-limit: 10000
-    tm:
-      commit-retry-count: 5
-      rollback-retry-count: 5
-  registry:
-    type: nacos
-    nacos:
-      application: seata-server
-      server-addr: tc:8848
-      group: "SEATA_GROUP"
-      namespace: "public"
-      cluster: default
-
 rocketmq:
   name-server: tc:9876 # 你的 RocketMQ 地址
   producer:

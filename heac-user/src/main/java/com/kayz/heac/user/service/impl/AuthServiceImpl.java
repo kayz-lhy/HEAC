@@ -6,6 +6,7 @@ import com.kayz.heac.user.domain.dto.UserLoginDTO;
 import com.kayz.heac.user.domain.vo.UserInfoVO;
 import com.kayz.heac.user.domain.vo.UserLoginVO;
 import com.kayz.heac.user.entity.User;
+import com.kayz.heac.user.mq.LoginLogProducer;
 import com.kayz.heac.user.service.AuthService;
 import com.kayz.heac.user.service.TokenService;
 import com.kayz.heac.user.service.UserService;
@@ -13,7 +14,6 @@ import com.kayz.heac.user.util.IpUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
     private final TokenService tokenService;
-    private final RocketMQTemplate rocketMQTemplate;
+    private final LoginLogProducer loginLogProducer;
 
     @Override
     public UserLoginVO login(UserLoginDTO loginDto, HttpServletRequest request) {
@@ -105,10 +105,7 @@ public class AuthServiceImpl implements AuthService {
                     .ip(ip)
                     .loginTime(LocalDateTime.now())
                     .build();
-
-            // 发送到 RocketMQ
-            // Topic: user-topic, Tag: login
-            rocketMQTemplate.convertAndSend("user-topic:login", logDTO);
+            loginLogProducer.sendLoginLogMessage(logDTO);
 
         } catch (Exception e) {
             // 日志发送失败不应阻断登录流程，仅记录错误供运维排查

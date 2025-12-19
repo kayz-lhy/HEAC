@@ -42,28 +42,10 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-        <!-- Sentinel 流量防卫兵 -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+            <artifactId>spring-cloud-starter-stream-rocketmq</artifactId>
         </dependency>
-        <!-- Seata 分布式事务 (使用 SCA 默认集成的版本，最稳妥) -->
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.seata</groupId>
-                    <artifactId>seata-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seata</groupId>
-            <artifactId>seata-spring-boot-starter</artifactId>
-            <version>${seata.version}</version>
-        </dependency>
-
         <!-- ========================================================== -->
         <!-- 3. Spring Boot 核心 -->
         <!-- ========================================================== -->

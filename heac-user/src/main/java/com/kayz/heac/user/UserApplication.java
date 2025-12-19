@@ -2,7 +2,6 @@ package com.kayz.heac.user;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.seata.spring.annotation.datasource.EnableAutoDataSourceProxy;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,7 +14,6 @@ import java.util.TimeZone;
 @MapperScan("com.kayz.heac.user.mapper")
 @Slf4j
 @ComponentScan(basePackages = "com.kayz.heac")
-@EnableAutoDataSourceProxy(dataSourceProxyMode = "AT")
 public class UserApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class, args);

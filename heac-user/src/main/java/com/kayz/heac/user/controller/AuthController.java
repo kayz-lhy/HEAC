@@ -1,6 +1,5 @@
 package com.kayz.heac.user.controller;
 
-import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.kayz.heac.common.context.UserContext;
 import com.kayz.heac.common.entity.HeacResponse;
 import com.kayz.heac.user.domain.dto.UserLoginDTO;
@@ -35,7 +34,6 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "用户注册", description = "新用户注册，账号不可重复")
-    @SentinelResource("注册接口")
     public HeacResponse<String> register(@RequestBody @Valid UserRegisterDTO request) {
         userService.register(request);
         return HeacResponse.success("注册成功");
@@ -43,7 +41,6 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "账号密码登录，返回 JWT 令牌")
-    @SentinelResource("登录接口")
     public HeacResponse<UserLoginVO> login(@RequestBody @Valid UserLoginDTO request,
                                            HttpServletRequest servletRequest) {
         UserLoginVO vo = authService.login(request, servletRequest);
